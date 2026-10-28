@@ -1,0 +1,18 @@
+{
+  "file": "proofs/12_dtn_custody_chain.lean",
+  "source_sha256": "d5508ac6281cbb52e300ba6daf238b5a2e886af5e9efcec8c6619fc0e4aea113",
+  "statement_sha256": "450db63767abf95829f2c2cd332556a2d96a4e4c521ace127f8bf64a26eb6e02",
+  "theorems": [
+    "final_is_last_dst",
+    "gap_detected",
+    "splice",
+    "valid_tail"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:58Z"
+}

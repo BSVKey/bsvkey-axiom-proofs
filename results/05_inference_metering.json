@@ -1,0 +1,19 @@
+{
+  "file": "proofs/05_inference_metering.lean",
+  "source_sha256": "a09f493b3d034aeed24d5567b11f76d572e44ba25bf3be9a4484751acfa9a3d3",
+  "statement_sha256": "5662e66209e10b2170fe6ce2dc54b6b97baed865a3e1f00632b81e0daf878e2b",
+  "theorems": [
+    "bill_covers_cost",
+    "bill_monotone",
+    "bill_zero",
+    "msat_additive",
+    "split_overhead"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:58Z"
+}

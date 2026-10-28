@@ -1,0 +1,19 @@
+{
+  "file": "proofs/04_governor_spend_cap.lean",
+  "source_sha256": "d9a79661545f6e23b3dc881131399c9e7b4465c783b00138930904dfc9611210",
+  "statement_sha256": "6d520e349a082da32ea8f0466569a58f29049fbf85795df46a7ecb7d7cdc512a",
+  "theorems": [
+    "handle_cap_fixed",
+    "handle_killed_fixed",
+    "handle_within_cap",
+    "killed_blocks_all",
+    "never_over_cap"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:57Z"
+}

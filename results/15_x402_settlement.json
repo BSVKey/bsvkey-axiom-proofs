@@ -1,0 +1,17 @@
+{
+  "file": "proofs/15_x402_settlement.lean",
+  "source_sha256": "3a0cc173a4a8c64f8ccd38db25a1c3ccf2c9ecd5719827b25f1dc1be6d5142e2",
+  "statement_sha256": "6bb4bcce69d29a49e80ebf9938bc1e4de9e8f1673a6899ea30d57dbb27d1e42a",
+  "theorems": [
+    "rejected_is_final",
+    "serve_needs_accept",
+    "served_implies_accepted"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:59Z"
+}

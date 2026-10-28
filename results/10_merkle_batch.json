@@ -1,0 +1,17 @@
+{
+  "file": "proofs/10_merkle_batch.lean",
+  "source_sha256": "e4074b2db29e7cde028630e2bcb27d709a368ff623707c385f04329ee4f23207",
+  "statement_sha256": "db411f002d1b0e8f9c0b22bfb640274b7cdad2716e2169bdbbce384136445d6d",
+  "theorems": [
+    "climb_append",
+    "path_exists",
+    "root_binding"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:58Z"
+}

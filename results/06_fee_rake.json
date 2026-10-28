@@ -1,0 +1,18 @@
+{
+  "file": "proofs/06_fee_rake.lean",
+  "source_sha256": "afaa030ff0c0e1d2605d28c48be09bbf00f6cbcd5ccf37ef400648a837f7d56a",
+  "statement_sha256": "2ad10999c83d5283031743f26d3a6fc3543af903a7b56ffe1e21aea3435c0504",
+  "theorems": [
+    "fee_le_amount",
+    "fee_monotone",
+    "split_exact",
+    "zero_rake"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:35:12Z"
+}

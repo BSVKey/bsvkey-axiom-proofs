@@ -1,0 +1,17 @@
+{
+  "file": "proofs/13_paid_dm_gate.lean",
+  "source_sha256": "a429c0ccca77482d64addf069404f957686d1f31942fa01039c29ae032387007",
+  "statement_sha256": "254f4666b0ef4b55b0cf1cdba30c5d943999fe72a02400e3846c1da9c50f2942",
+  "theorems": [
+    "delivered_paid",
+    "higher_price_fewer",
+    "revenue_floor"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:59Z"
+}

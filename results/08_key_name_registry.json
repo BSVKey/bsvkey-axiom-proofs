@@ -1,0 +1,18 @@
+{
+  "file": "proofs/08_key_name_registry.lean",
+  "source_sha256": "38923884824792143d4bc6d0544bcd06d7ce891934514ca0b83b07a4ddc49777",
+  "statement_sha256": "9474563fe7f4b9fbbc00c29674aa0e5dbd0b9f4c1d8c0ba9482c802d03b0e057",
+  "theorems": [
+    "no_double_owner",
+    "registerAll_unique",
+    "register_unique",
+    "stranger_cannot_transfer"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:58Z"
+}

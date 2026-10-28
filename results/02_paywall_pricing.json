@@ -1,0 +1,18 @@
+{
+  "file": "proofs/02_paywall_pricing.lean",
+  "source_sha256": "378a42c80c831ea5f6afa9f253d3bbda1b6e6dcbd385b9862e54c5a1cde84002",
+  "statement_sha256": "471a9b80215bf79691f60f7c403ca4395d8bdf9ea62f0adbb45688b430c90514",
+  "theorems": [
+    "margin_tight",
+    "price_covers_margin",
+    "price_ge_floor",
+    "price_monotone"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:57Z"
+}

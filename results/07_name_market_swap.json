@@ -1,0 +1,18 @@
+{
+  "file": "proofs/07_name_market_swap.lean",
+  "source_sha256": "170879b0a0c5b5c3ff7868085ee73fe1f5f8a330878764ab6c31c5ad47394b54",
+  "statement_sha256": "f0953e60e2439daf770e43d70fc003814b4ba337a0202bea8d5faccd152b620b",
+  "theorems": [
+    "atomic",
+    "money_conserved",
+    "must_pay",
+    "no_sig_no_move"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:58Z"
+}

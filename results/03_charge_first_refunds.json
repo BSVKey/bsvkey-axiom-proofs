@@ -1,0 +1,18 @@
+{
+  "file": "proofs/03_charge_first_refunds.lean",
+  "source_sha256": "257df934ed6169cd77055837b4646bcb063e50a4664940e23e119856a05a6502",
+  "statement_sha256": "ebe1158bffef7d8149ef54e665a45c9e706dbbd818a0f6006e9c4aaf79e42b8f",
+  "theorems": [
+    "charge_unchanged",
+    "fresh_order_safe",
+    "processAll_valid",
+    "requestRefund_valid"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:57Z"
+}

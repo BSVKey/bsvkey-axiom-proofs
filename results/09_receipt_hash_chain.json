@@ -1,0 +1,16 @@
+{
+  "file": "proofs/09_receipt_hash_chain.lean",
+  "source_sha256": "8b3494529121c08cb4a7eb261267ccaf24af802d75dbed021f42c071892c39d3",
+  "statement_sha256": "733ae1934fe50cb0a3486b57a48c1120f47f6db84c530df473a5a116c21fe92e",
+  "theorems": [
+    "head_determines_chain",
+    "tamper_detected"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:58Z"
+}

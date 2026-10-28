@@ -1,0 +1,19 @@
+{
+  "file": "proofs/01_payment_channel.lean",
+  "source_sha256": "503eaa068ed6c3b517b12d780dde28d82b4b74630dbd5db1c833d03b9385aad6",
+  "statement_sha256": "467f2ea0e31df04724c987f325bf5322cdca7e756746ccec64d079301553f890",
+  "theorems": [
+    "pay_conserves",
+    "pay_no_overdraft",
+    "refund_conserves",
+    "run_conserves",
+    "step_conserves"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:57Z"
+}

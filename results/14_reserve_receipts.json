@@ -1,0 +1,18 @@
+{
+  "file": "proofs/14_reserve_receipts.lean",
+  "source_sha256": "8114e60424d020ea9178ec748d8c68b98627b7876e22ee74114ad83afaee0105",
+  "statement_sha256": "73c6ae04af373f00da5560c580e80695f4d6ad47518580736154e666381deb5f",
+  "theorems": [
+    "always_solvent",
+    "deposit_solvent",
+    "sum_set",
+    "withdraw_solvent"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:59Z"
+}

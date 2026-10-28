@@ -1,0 +1,17 @@
+{
+  "file": "proofs/11_wallet_idle_lock.lean",
+  "source_sha256": "b9d8022c5485c610db916cd2aac1fd74a70e18126aed8b892407ba801c49e33c",
+  "statement_sha256": "3ee804181bb7a585822c9332b070d520df576bd13741e255db104504e9848156",
+  "theorems": [
+    "active_stays_open",
+    "idle_locks",
+    "lock_is_sticky"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-28T11:33:58Z"
+}
