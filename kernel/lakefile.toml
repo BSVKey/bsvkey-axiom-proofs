@@ -1,0 +1,11 @@
+name = "kernel"
+defaultTargets = ["Proofs"]
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.35.0"
+
+# Proofs/ and Proofs.lean are generated from ../proofs by tools/kernel_project.py
+[[lean_lib]]
+name = "Proofs"

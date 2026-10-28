@@ -3,3 +3,6 @@ __pycache__/
 .venv/
 venv/
 .lake/
+kernel/Proofs/
+kernel/Proofs.lean
+kernel/Audit.lean

@@ -17,6 +17,43 @@ jobs:
           python-version: "3.12"
       - run: python -m unittest discover -s tests -v
 
+  kernel:
+    # Independent of AXLE: official Lean 4.35.0 and Mathlib v4.35.0 on GitHub's runner.
+    name: kernel replay (Lean 4.35.0 + Mathlib)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Copy the 15 proof files into a Lake library (kernel/Proofs)
+        run: python tools/kernel_project.py
+      - name: Build, replay every declaration through the kernel, audit axioms
+        uses: leanprover/lean-action@v1.7.0
+        env:
+          LEAN_NUM_THREADS: "1"
+        with:
+          lake-package-directory: kernel
+          use-mathlib-cache: "true"
+          build: "true"
+          test: "false"
+          lint: "false"
+          leanchecker: "true"
+          leanchecker-args: "-v Proofs"
+          axiom-audit: "true"
+          axiom-audit-root: BSVKey
+      - name: Each of the 57 theorems uses only propext, Classical.choice, Quot.sound
+        run: python tools/kernel_project.py --audit
+      - name: The same replay rejects the AXLE exploit (proof the check has teeth)
+        working-directory: soundness/kernel-replay
+        run: |
+          lake build
+          lake env leanchecker Honest
+          if lake env leanchecker Exploit; then
+            echo "::error::leanchecker accepted the proof of False"; exit 1
+          fi
+          echo "leanchecker rejected Exploit as expected"
+
   axle:
     # Sends the public proof files to Axiom's AXLE servers (no privacy).
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
