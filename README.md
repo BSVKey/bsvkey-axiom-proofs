@@ -86,6 +86,53 @@ All 15 files pass AXLE (57 theorems in total). Results are in [`results/`](resul
   AXLE rejects it, and `disprove` finds the counterexample (a cost of 1 sat is underpriced).
 - `sorry_governor.lean`: an unfinished proof. AXLE rejects it.
 
+## Check a receipt in your browser
+
+[`index.html`](index.html) checks any proof against its receipt and the
+on-chain root with nothing installed: it hashes the file with Web Crypto,
+rebuilds the receipt leaf, climbs the Merkle path and reads the transaction
+from WhatsOnChain. "Check all 15" runs every file. You can also drop your own
+copy of a `.lean` file on it to see whether it is the exact file AXLE checked.
+Open it from a local copy of the repo with any static server, for example
+`python -m http.server --directory .`
+
+## Use AXLE in your own CI
+
+This repo is also a GitHub Action. Add to any workflow:
+
+```yaml
+- uses: actions/checkout@v4
+- uses: BSVKey/bsvkey-axiom-proofs@main
+  with:
+    path: proofs            # folder of .lean files, searched recursively
+    # api-key: ${{ secrets.AXLE_API_KEY }}   # optional, raises rate limits
+```
+
+It checks every file with AXLE and writes a pass/fail table to the job page.
+No Lean install, no Mathlib build. **No privacy:** the files are sent in plain
+text to Axiom's servers, so only use it on code you would publish anyway.
+
+## Plain-Lean guard
+
+Before anything is sent, [`tools/lean_guard.py`](tools/lean_guard.py) refuses
+files that use metaprogramming (`run_cmd`, `#eval`, `elab`, `macro`, `open Lean`),
+`unsafe` code, `implemented_by`, extra axioms, `native_decide`, checker
+options or imports other than Mathlib. Receipts are only for plain definitions
+and theorems, the same rule many proof competitions use. It is defense in
+depth on top of AXLE, and it runs in the Action too.
+
+## Soundness tests of AXLE
+
+[`soundness/`](soundness) holds adversarial cases: files that try to make
+`verify_proof` accept a false or unproven claim (hidden `sorry`, custom axioms,
+`native_decide`, weaker or renamed statements, redefined definitions, instance,
+notation and macro overrides of `+`, `#exit`, `opaque` and `unsafe` tricks),
+plus honest controls that must pass. AXLE handled all of them correctly.
+
+```powershell
+python soundness\run_soundness.py
+```
+
 ## What these proofs do and do not show
 
 - Each file proves a property of a **model** of a BSVKey rule, written in Lean.
@@ -102,6 +149,7 @@ PowerShell, from the repo folder (Python 3.11 or later):
 
 ```powershell
 python -m pip install -r requirements.txt
+python tools\lean_guard.py proofs\01_payment_channel.lean
 python tools\axle_verify.py
 python tools\axle_negative.py
 python tools\proof_receipt.py build

@@ -26,8 +26,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Check proofs with this repo's own action
+        uses: ./
+        with:
+          path: proofs
       - run: python -m pip install -r requirements.txt
-      - run: python tools/axle_verify.py
       - run: python tools/axle_negative.py
+      - run: python soundness/run_soundness.py
       - name: Proof files still match the committed receipts
         run: python -m unittest tests.test_receipts.CommittedBatchTests -v

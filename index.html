@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proof Receipt Check</title>
+<meta name="description" content="Check, in your browser, that a BSVKey Lean proof matches its AXLE receipt and the Merkle root anchored on Bitcoin BSV.">
+<style>
+  :root {
+    --bg: #f7f7f4; --card: #ffffff; --ink: #1b1d1f; --muted: #5d6368; --line: #dfe1dc;
+    --accent: #1f6f5c; --pass: #1f7a45; --fail: #b3261e; --wait: #8a6d00; --code: #f0f1ec;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141618; --card: #1d2023; --ink: #e9ebe6; --muted: #a2a9ae; --line: #30353a;
+      --accent: #5cc2a5; --pass: #5fd08f; --fail: #ff8a80; --wait: #e6c35c; --code: #25292d;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141618; --card: #1d2023; --ink: #e9ebe6; --muted: #a2a9ae; --line: #30353a;
+    --accent: #5cc2a5; --pass: #5fd08f; --fail: #ff8a80; --wait: #e6c35c; --code: #25292d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 1.6rem; margin: 0 0 6px; }
+  .lede { color: var(--muted); margin: 0 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin: 16px 0; }
+  .warn { border-left: 4px solid var(--wait); }
+  label { font-weight: 600; display: block; margin-bottom: 6px; }
+  select, button { font: inherit; }
+  select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  button { padding: 10px 16px; border-radius: 8px; border: 1px solid var(--accent); cursor: pointer;
+           background: var(--accent); color: #fff; font-weight: 600; }
+  button.ghost { background: transparent; color: var(--accent); }
+  .drop { margin-top: 12px; padding: 14px; border: 2px dashed var(--line); border-radius: 10px; color: var(--muted); text-align: center; }
+  .drop.over { border-color: var(--accent); color: var(--ink); }
+  ol.steps { list-style: none; padding: 0; margin: 0; }
+  ol.steps li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 12px 0; border-top: 1px solid var(--line); }
+  ol.steps li:first-child { border-top: 0; }
+  .dot { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700;
+         background: var(--code); color: var(--muted); }
+  .pass .dot { background: var(--pass); color: #fff; }
+  .fail .dot { background: var(--fail); color: #fff; }
+  .step-title { font-weight: 600; }
+  .tip { color: var(--muted); font-size: 0.92rem; }
+  code, .hash { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.84rem;
+                background: var(--code); border-radius: 4px; padding: 1px 4px; overflow-wrap: anywhere; }
+  .verdict { font-size: 1.15rem; font-weight: 700; margin: 0; }
+  .verdict.pass { color: var(--pass); } .verdict.fail { color: var(--fail); }
+  a { color: var(--accent); }
+  details summary { cursor: pointer; font-weight: 600; }
+  pre { background: var(--code); padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Proof receipt check</h1>
+  <p class="lede">Check that a Lean proof from
+    <a href="https://github.com/BSVKey/bsvkey-axiom-proofs">BSVKey/bsvkey-axiom-proofs</a>
+    is exactly the file Axiom's AXLE checked, and that its receipt is anchored on Bitcoin BSV.
+    Everything runs in your browser. Nothing is uploaded.</p>
+
+  <div class="card">
+    <label for="pick">1. Pick a proof</label>
+    <select id="pick"><option>Loading the receipt batch…</option></select>
+    <div class="drop" id="drop">Or drop your own copy of a <code>.lean</code> file here to check that copy instead.</div>
+    <div class="row">
+      <button id="run" disabled>2. Check it</button>
+      <button id="all" class="ghost" disabled>Check all 15</button>
+    </div>
+  </div>
+
+  <div class="card" id="out" hidden>
+    <p class="verdict" id="verdict"></p>
+    <ol class="steps" id="steps"></ol>
+    <p class="tip" id="next"></p>
+  </div>
+
+  <div class="card warn">
+    <strong>What a pass means, and what it does not.</strong>
+    <p class="tip">A pass means this file is byte for byte the one AXLE accepted, and its receipt is in a
+      Merkle root that a Bitcoin BSV transaction carries. It does not re-run Lean: to confirm the proof itself,
+      run <code>python tools\axle_verify.py</code> or check the file with your own Lean 4.35 and Mathlib.
+      Each proof covers a model of a BSVKey rule, not the deployed code. There is no privacy: the proofs,
+      receipts and transaction are all public.</p>
+  </div>
+
+  <details class="card">
+    <summary>How the check works</summary>
+    <pre>file hash   = SHA-256(file, BOM removed, CRLF -> LF)      must equal receipt.source_sha256
+leaf        = SHA-256(0x00 || canonical JSON of receipt)  must equal the listed leaf
+root        = climb leaf with SHA-256(0x01 || left || right) along the path
+on-chain    = transaction output: OP_FALSE OP_RETURN "bsvkey.proof" &lt;root&gt;</pre>
+  </details>
+</main>
+
+<script>
+(() => {
+  const RAW = "https://raw.githubusercontent.com/BSVKey/bsvkey-axiom-proofs/main/";
+  const WOC = "https://api.whatsonchain.com/v1/bsv/main/tx/hash/";
+  const TAG_HEX = "006a0c" + hex(new TextEncoder().encode("bsvkey.proof")) + "20";
+  const $ = (id) => document.getElementById(id);
+  let batch = null, dropped = null, txCache = null;
+
+  function hex(bytes) { return [...bytes].map(b => b.toString(16).padStart(2, "0")).join(""); }
+  function unhex(h) { return new Uint8Array(h.match(/../g).map(x => parseInt(x, 16))); }
+  async function sha256(bytes) { return new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)); }
+  function concat(...parts) {
+    const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0)); let i = 0;
+    for (const p of parts) { out.set(p, i); i += p.length; } return out;
+  }
+  // Same bytes as Python json.dumps(sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+  function canonical(v) {
+    if (Array.isArray(v)) return "[" + v.map(canonical).join(",") + "]";
+    if (v && typeof v === "object") return "{" + Object.keys(v).sort().map(k => JSON.stringify(k) + ":" + canonical(v[k])).join(",") + "}";
+    return JSON.stringify(v);
+  }
+  function normalize(bytes) {
+    let b = bytes;
+    if (b[0] === 0xef && b[1] === 0xbb && b[2] === 0xbf) b = b.slice(3);
+    const out = []; for (let i = 0; i < b.length; i++) { if (b[i] === 13 && b[i + 1] === 10) continue; out.push(b[i]); }
+    return new Uint8Array(out);
+  }
+  async function getJSON(path) {
+    for (const base of ["", RAW]) {
+      try { const r = await fetch(base + path, { cache: "no-store" }); if (r.ok) return await r.json(); } catch (_) {}
+    }
+    throw new Error("could not load " + path);
+  }
+  async function getBytes(path) {
+    for (const base of ["", RAW]) {
+      try { const r = await fetch(base + path, { cache: "no-store" }); if (r.ok) return new Uint8Array(await r.arrayBuffer()); } catch (_) {}
+    }
+    throw new Error("could not load " + path);
+  }
+  async function getTx() {
+    if (!txCache) { const r = await fetch(WOC + batch.anchor_txid); if (!r.ok) throw new Error("WhatsOnChain " + r.status); txCache = await r.json(); }
+    return txCache;
+  }
+
+  async function checkOne(entry, fileBytes) {
+    const steps = [];
+    const add = (ok, title, detail) => steps.push({ ok, title, detail });
+    const r = entry.receipt;
+    const fileHash = hex(await sha256(normalize(fileBytes)));
+    add(fileHash === r.source_sha256, "File matches what AXLE checked",
+        `SHA-256 <span class="hash">${fileHash}</span>` + (fileHash === r.source_sha256 ? "" : `<br>receipt says <span class="hash">${r.source_sha256}</span>`));
+    const leaf = await sha256(concat(new Uint8Array([0]), new TextEncoder().encode(canonical(r))));
+    add(hex(leaf) === entry.leaf, "Receipt is intact",
+        `${r.theorems.length} theorems, checked ${r.checked_at} on ${r.environment} by ${r.checker}`);
+    let h = leaf;
+    for (const s of entry.path) {
+      const sib = unhex(s.hash);
+      h = await sha256(s.side === "left" ? concat(new Uint8Array([1]), sib, h) : concat(new Uint8Array([1]), h, sib));
+    }
+    add(hex(h) === batch.merkle_root, "Receipt is in the anchored batch",
+        `climbs ${entry.path.length} levels to root <span class="hash">${batch.merkle_root}</span>`);
+    try {
+      const tx = await getTx();
+      const want = TAG_HEX + batch.merkle_root;
+      const found = tx.vout.some(o => o.scriptPubKey.hex === want);
+      const conf = tx.confirmations ? `${tx.confirmations} confirmations, block ${tx.blockheight}` : "in the mempool, not yet in a block";
+      add(found, "Root is on Bitcoin BSV",
+          `transaction <a href="https://whatsonchain.com/tx/${batch.anchor_txid}" target="_blank" rel="noopener"><span class="hash">${batch.anchor_txid}</span></a> (${conf})`);
+    } catch (e) {
+      add(false, "Root is on Bitcoin BSV", "could not reach WhatsOnChain: " + e.message + ". Try again in a minute.");
+    }
+    return steps;
+  }
+
+  function render(title, steps, next) {
+    const ok = steps.every(s => s.ok);
+    $("out").hidden = false;
+    $("verdict").className = "verdict " + (ok ? "pass" : "fail");
+    $("verdict").textContent = (ok ? "PASS: " : "FAIL: ") + title;
+    $("steps").innerHTML = steps.map((s, i) =>
+      `<li class="${s.ok ? "pass" : "fail"}"><span class="dot">${s.ok ? "✓" : "✗"}</span>
+       <div><div class="step-title">${i + 1}. ${s.title}</div><div class="tip">${s.detail}</div></div></li>`).join("");
+    $("next").innerHTML = next(ok);
+    $("out").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  async function runSelected() {
+    const entry = batch.receipts[$("pick").value];
+    $("run").disabled = true; $("run").textContent = "Checking…";
+    try {
+      const bytes = dropped || await getBytes(entry.receipt.file);
+      const steps = await checkOne(entry, bytes);
+      render(entry.receipt.file + (dropped ? " (your copy)" : ""), steps, ok => ok
+        ? `Next: <a href="https://github.com/BSVKey/bsvkey-axiom-proofs/blob/main/${entry.receipt.file}" target="_blank" rel="noopener">read the proof</a>, or pick another file above.`
+        : `A failed first step usually means the file was edited after it was checked. Compare it with the
+           <a href="https://github.com/BSVKey/bsvkey-axiom-proofs/blob/main/${entry.receipt.file}" target="_blank" rel="noopener">published copy</a>.`);
+    } catch (e) { render("could not check", [{ ok: false, title: "Load error", detail: e.message }], () => "Reload the page and try again."); }
+    $("run").disabled = false; $("run").textContent = "2. Check it";
+  }
+
+  async function runAll() {
+    $("all").disabled = true; $("all").textContent = "Checking all…";
+    const steps = [];
+    for (const entry of batch.receipts) {
+      try {
+        const s = await checkOne(entry, await getBytes(entry.receipt.file));
+        const ok = s.every(x => x.ok);
+        steps.push({ ok, title: entry.receipt.file, detail: ok ? `${entry.receipt.theorems.length} theorems; file, receipt, root and transaction all match`
+                     : s.filter(x => !x.ok).map(x => x.title + " failed").join("; ") });
+      } catch (e) { steps.push({ ok: false, title: entry.receipt.file, detail: e.message }); }
+    }
+    render(`${steps.filter(s => s.ok).length} of ${steps.length} proofs match the anchored batch`, steps,
+           ok => ok ? "Every published proof is exactly what AXLE checked and what the transaction commits to." : "See the failed rows above.");
+    $("all").disabled = false; $("all").textContent = "Check all 15";
+  }
+
+  const drop = $("drop");
+  ["dragenter", "dragover"].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach(e => drop.addEventListener(e, () => drop.classList.remove("over")));
+  drop.addEventListener("drop", async ev => {
+    ev.preventDefault();
+    const f = ev.dataTransfer.files[0]; if (!f) return;
+    dropped = new Uint8Array(await f.arrayBuffer());
+    const idx = batch.receipts.findIndex(e => e.receipt.file.endsWith("/" + f.name));
+    if (idx >= 0) $("pick").value = idx;
+    drop.innerHTML = `Using your copy: <code>${f.name}</code>. Pick a different file above to go back.`;
+    runSelected();
+  });
+  $("pick").addEventListener("change", () => { dropped = null; drop.innerHTML = 'Or drop your own copy of a <code>.lean</code> file here to check that copy instead.'; });
+  $("run").addEventListener("click", runSelected);
+  $("all").addEventListener("click", runAll);
+
+  getJSON("receipts/batch.json").then(b => {
+    batch = b;
+    $("pick").innerHTML = b.receipts.map((e, i) =>
+      `<option value="${i}">${e.receipt.file.replace("proofs/", "")} (${e.receipt.theorems.length} theorems)</option>`).join("");
+    $("run").disabled = false; $("all").disabled = false;
+  }).catch(e => { $("pick").innerHTML = `<option>Could not load receipts: ${e.message}</option>`; });
+})();
+</script>
+</body>
+</html>

@@ -24,9 +24,11 @@ import sys
 
 from axle import AxleApiError, AxleClient
 
+import lean_guard
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-PROOFS = ROOT / "proofs"
-RESULTS = ROOT / "results"
+PROOFS = pathlib.Path(os.environ.get("AXLE_PROOFS_DIR", ROOT / "proofs")).resolve()
+RESULTS = pathlib.Path(os.environ.get("AXLE_RESULTS_DIR", ROOT / "results")).resolve()
 ENVIRONMENT = os.environ.get("AXLE_ENVIRONMENT", "lean-4.35.0")
 
 
@@ -48,7 +50,7 @@ async def verify_one(client: AxleClient, limit: asyncio.Semaphore, path: pathlib
         if line.startswith("theorem ")
     })
     report = {
-        "file": f"proofs/{path.name}",
+        "file": path.relative_to(PROOFS.parent).as_posix(),
         "source_sha256": sha256_hex(raw),
         "statement_sha256": None,
         "theorems": theorems,
@@ -59,6 +61,11 @@ async def verify_one(client: AxleClient, limit: asyncio.Semaphore, path: pathlib
         "failed_declarations": [],
         "errors": [],
     }
+    refused = lean_guard.check_source(content)
+    if refused:
+        report["errors"] = ["lean_guard refused the file (not sent to AXLE): " + "; ".join(refused)]
+        report["checked_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        return report
     async with limit:
         try:
             statement = await client.theorem2sorry(content=content, environment=ENVIRONMENT)
@@ -79,7 +86,7 @@ async def verify_one(client: AxleClient, limit: asyncio.Semaphore, path: pathlib
 
 
 async def main(prefixes: list[str]) -> int:
-    files = sorted(PROOFS.glob("*.lean"))
+    files = sorted(p for p in PROOFS.rglob("*.lean") if ".lake" not in p.parts)
     if prefixes:
         files = [f for f in files if any(f.name.startswith(p) for p in prefixes)]
     RESULTS.mkdir(exist_ok=True)
@@ -89,7 +96,7 @@ async def main(prefixes: list[str]) -> int:
     async with AxleClient(api_key=os.environ.get("AXLE_API_KEY")) as client:
         reports = await asyncio.gather(*(verify_one(client, limit, f) for f in files))
     for path, report in zip(files, reports):
-        out = RESULTS / (path.stem + ".json")
+        out = RESULTS / (path.relative_to(PROOFS).with_suffix("").as_posix().replace("/", "__") + ".json")
         out.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
         mark = "PASS" if report["okay"] else "FAIL"
         print(f"{mark}  {path.name}  ({len(report['theorems'])} theorems)")
@@ -98,7 +105,23 @@ async def main(prefixes: list[str]) -> int:
             for err in report["errors"]:
                 print("      " + err.replace("\n", "\n      "))
     print(f"\n{len(files) - failed}/{len(files)} proof files verified by AXLE ({ENVIRONMENT})")
+    write_step_summary(reports, failed)
     return 1 if failed else 0
+
+
+def write_step_summary(reports: list[dict], failed: int) -> None:
+    """Markdown table for the GitHub Actions job page, when running in Actions."""
+    target = os.environ.get("GITHUB_STEP_SUMMARY")
+    if not target:
+        return
+    rows = [
+        f"| {'✅' if r['okay'] else '❌'} | `{r['file']}` | {len(r['theorems'])} | `{r['source_sha256'][:12]}` |"
+        for r in reports
+    ]
+    with open(target, "a", encoding="utf-8") as fh:
+        fh.write(f"### AXLE proof check: {len(reports) - failed}/{len(reports)} files verified ({ENVIRONMENT})\n\n")
+        fh.write("| | File | Theorems | SHA-256 |\n|---|---|---|---|\n" + "\n".join(rows) + "\n\n")
+        fh.write("Files are checked by plain-Lean guard first, then sent in plain text to Axiom's AXLE.\n")
 
 
 if __name__ == "__main__":

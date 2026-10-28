@@ -1,0 +1,174 @@
+{
+  "environment": "lean-4.35.0",
+  "cases": [
+    {
+      "name": "control_honest",
+      "expect": "accept",
+      "accepted": true,
+      "sound": true,
+      "reason": []
+    },
+    {
+      "name": "control_helper_lemma",
+      "expect": "accept",
+      "accepted": true,
+      "sound": true,
+      "reason": []
+    },
+    {
+      "name": "sorry",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "Declaration 't' is incomplete (uses 'sorry' or has errors)"
+      ]
+    },
+    {
+      "name": "custom_axiom",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "In 't': Axiom 'cheat' is not in the allowed set of standard axioms"
+      ]
+    },
+    {
+      "name": "sorry_hidden_in_macro",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "Declaration 't' is incomplete (uses 'sorry' or has errors)"
+      ]
+    },
+    {
+      "name": "sorry_in_helper",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "Declaration 't' is incomplete (uses 'sorry' or has errors)"
+      ]
+    },
+    {
+      "name": "native_decide_true_claim",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "In 't': Axiom 't._native.native_decide.ax_1' is not in the allowed set of standard axioms"
+      ]
+    },
+    {
+      "name": "weaker_statement_same_name",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "Theorem 't' does not match expected signature: expected type 2 + 2 = 5, got 2 + 2 = 4"
+      ]
+    },
+    {
+      "name": "extra_hypothesis",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "Theorem 't' does not match expected signature: expected type ∀ (n : ℕ), n < 10, got ∀ n < 5, n < 10"
+      ]
+    },
+    {
+      "name": "namespace_shadow",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "Missing required declaration 't'"
+      ]
+    },
+    {
+      "name": "redefine_def_in_statement",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "Theorem 't' does not match expected signature: expected type secret = 2, got secret = 2",
+        "Definition 'secret' does not match expected signature: expected value 1, got 2"
+      ]
+    },
+    {
+      "name": "instance_override_add",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "Theorem 't' does not match expected signature: expected type 2 + 3 = 6, got 2 + 3 = 6"
+      ]
+    },
+    {
+      "name": "macro_rules_rewrite_plus",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "Theorem 't' does not match expected signature: expected type 2 + 3 = 6, got Nat.mul 2 3 = 6"
+      ]
+    },
+    {
+      "name": "notation_override",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "Theorem 't' does not match expected signature: expected type 2 + 3 = 6, got 2 + 3 = 6"
+      ]
+    },
+    {
+      "name": "redefine_False",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "-:3:4-3:9: error: `False` has already been declared\n",
+        "-:4:21-4:28: error: Type mismatch\n  trivial\nhas type\n  True\nbut is expected to have type\n  False\n"
+      ]
+    },
+    {
+      "name": "skip_kernel_tc_option",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "-:4:28-4:34: error: Tactic `decide` proved that the proposition\n  2 + 2 = 5\nis false\n"
+      ]
+    },
+    {
+      "name": "unsafe_cast",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "-:4:0-4:42: error: failed to synthesize 'Inhabited' or 'Nonempty' instance for\n  2 + 2 = 5\n\nIf this type is defined using the 'structure' or 'inductive' command, you can try adding a 'deriving Nonempty' clause to it.\n"
+      ]
+    },
+    {
+      "name": "opaque_proof",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "-:3:0-3:20: error: failed to synthesize 'Inhabited' or 'Nonempty' instance for\n  2 + 2 = 5\n\nIf this type is defined using the 'structure' or 'inductive' command, you can try adding a 'deriving Nonempty' clause to it.\n"
+      ]
+    },
+    {
+      "name": "exit_early",
+      "expect": "reject",
+      "accepted": false,
+      "sound": true,
+      "reason": [
+        "Missing required declaration 't'"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+name: AXLE Lean proof check
+description: >-
+  Check every Lean file in a folder with Axiom's AXLE (no local Lean install),
+  after a plain-Lean guard that refuses metaprogramming and trust escapes.
+  NO PRIVACY: files are sent in plain text to Axiom's servers.
+author: BSVKey
+branding:
+  icon: check-circle
+  color: green
+
+inputs:
+  path:
+    description: Folder of .lean files to check (searched recursively, .lake skipped)
+    default: proofs
+  environment:
+    description: AXLE Lean environment, for example lean-4.35.0
+    default: lean-4.35.0
+  api-key:
+    description: Optional AXLE API key for higher rate limits
+    default: ""
+  parallel:
+    description: Requests in flight at once (keep low without an API key)
+    default: "2"
+  results:
+    description: Folder to write one JSON result per file
+    default: axle-results
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - shell: bash
+      run: python -m pip install --quiet -r "$GITHUB_ACTION_PATH/requirements.txt"
+    - shell: bash
+      env:
+        AXLE_PROOFS_DIR: ${{ inputs.path }}
+        AXLE_RESULTS_DIR: ${{ inputs.results }}
+        AXLE_ENVIRONMENT: ${{ inputs.environment }}
+        AXLE_API_KEY: ${{ inputs.api-key }}
+        AXLE_PARALLEL: ${{ inputs.parallel }}
+      run: python "$GITHUB_ACTION_PATH/tools/axle_verify.py"
