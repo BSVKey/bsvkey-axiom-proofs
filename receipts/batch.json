@@ -2,7 +2,7 @@
   "schema": "bsvkey.proof-batch/1",
   "merkle_root": "0c202fbb16fae97fbf0f3cc9d494e4fed2b597fb5a2e33cb3b87deb2e93ee2d0",
   "op_return_script_hex": "006a0c6273766b65792e70726f6f66200c202fbb16fae97fbf0f3cc9d494e4fed2b597fb5a2e33cb3b87deb2e93ee2d0",
-  "anchor_txid": null,
+  "anchor_txid": "7a3a0e4e77454d51fdb2091eac4899bcda3fbc09e84e8440fd1f88a759bbedae",
   "receipts": [
     {
       "receipt": {

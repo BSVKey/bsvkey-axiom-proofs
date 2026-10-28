@@ -118,15 +118,19 @@ Current batch ([`receipts/batch.json`](receipts/batch.json)):
 
 - Merkle root: `0c202fbb16fae97fbf0f3cc9d494e4fed2b597fb5a2e33cb3b87deb2e93ee2d0`
 - OP_RETURN script: `OP_FALSE OP_RETURN "bsvkey.proof" <root>`
-- Anchored: **not yet**. No transaction has been sent.
+- Anchored on Bitcoin BSV mainnet in transaction
+  [`7a3a0e4e77454d51fdb2091eac4899bcda3fbc09e84e8440fd1f88a759bbedae`](https://whatsonchain.com/tx/7a3a0e4e77454d51fdb2091eac4899bcda3fbc09e84e8440fd1f88a759bbedae)
+  (broadcast 2026-10-28, one input, 25 sat fee).
 
-The tool never signs or broadcasts. To anchor, pay for one transaction with an
-output of the script above from a wallet you control, set `anchor_txid` in
-`receipts/batch.json`, then anyone can run:
+Anyone can check any proof file against that transaction:
 
 ```powershell
-python tools\proof_receipt.py verify proofs\04_governor_spend_cap.lean --txid <txid>
+python tools\proof_receipt.py verify proofs\04_governor_spend_cap.lean --txid 7a3a0e4e77454d51fdb2091eac4899bcda3fbc09e84e8440fd1f88a759bbedae
 ```
+
+The tool never signs or broadcasts. To anchor a new batch, pay for one
+transaction with an output of the batch's script from a wallet you control,
+then set `anchor_txid` in `receipts/batch.json`.
 
 That checks the file hash, the receipt, the Merkle path and the on-chain root
 through WhatsOnChain.
