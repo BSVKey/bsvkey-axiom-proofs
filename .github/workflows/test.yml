@@ -41,7 +41,6 @@ jobs:
           leanchecker: "true"
           leanchecker-args: "-v Proofs"
           axiom-audit: "true"
-          axiom-audit-root: BSVKey
       - name: Each of the 57 theorems uses only propext, Classical.choice, Quot.sound
         run: python tools/kernel_project.py --audit
       - name: The same replay rejects the AXLE exploit (proof the check has teeth)
