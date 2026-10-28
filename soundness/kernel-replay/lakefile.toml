@@ -1,0 +1,8 @@
+name = "kerneltest"
+defaultTargets = ["Exploit", "Honest"]
+
+[[lean_lib]]
+name = "Exploit"
+
+[[lean_lib]]
+name = "Honest"

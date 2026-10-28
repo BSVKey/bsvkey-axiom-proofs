@@ -33,7 +33,7 @@ async def run_case(client, limit, case):
     accepted = bool(okay)
     sound = accepted == (case["expect"] == "accept")
     return {"name": case["name"], "expect": case["expect"], "accepted": accepted, "sound": sound,
-            "reason": [w[:400] for w in why]}
+            "known_issue": case.get("known_issue", False), "reason": [w[:400] for w in why]}
 
 
 async def main():
@@ -43,14 +43,21 @@ async def main():
     (HERE / "results.json").write_text(json.dumps(
         {"environment": ENVIRONMENT, "cases": rows}, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     for r in rows:
-        mark = "OK  " if r["sound"] else "HOLE"
+        if r["sound"]:
+            mark = "FIXED" if r["known_issue"] else "OK   "
+        else:
+            mark = "KNOWN" if r["known_issue"] else "HOLE "
         print(f"{mark} {r['name']:<30} expect={r['expect']:<6} accepted={r['accepted']}")
-        if not r["sound"] or r["expect"] == "reject":
+        if r["expect"] == "reject" and not r["accepted"]:
             for w in r["reason"][:1]:
                 print("       " + w.splitlines()[0][:150])
     holes = [r["name"] for r in rows if not r["sound"]]
-    print(f"\n{len(rows) - len(holes)}/{len(rows)} cases handled soundly" + (f"; CHECK: {holes}" if holes else ""))
-    return 1 if holes else 0
+    new_holes = [r["name"] for r in rows if not r["sound"] and not r["known_issue"]]
+    print(f"\n{len(rows) - len(holes)}/{len(rows)} cases handled soundly")
+    if holes:
+        print(f"AXLE accepted {len(holes)} proof(s) of False: {holes}. See ADVISORY.md.")
+    # Fail CI only on a hole that is not already documented in ADVISORY.md.
+    return 1 if new_holes else 0
 
 
 if __name__ == "__main__":

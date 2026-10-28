@@ -4,6 +4,12 @@
 > Axiom Lean Engine from Axiom Math, against BSVKey. It is an experiment, not a
 > product, and not an endorsement by or partnership with Axiom.
 
+> **Advisory (2026-10-28):** AXLE's `verify_proof` can be made to accept a
+> proof of `False`. Details, reproduction and the fix: [ADVISORY.md](ADVISORY.md).
+> Our 15 proofs are unaffected: none use metaprogramming, and the guard refuses any file that does.
+
+> **Check the receipts in your browser:** https://bsvkey.github.io/bsvkey-axiom-proofs/
+
 > **No privacy.** Nothing in this repo is private, and AXLE gives no privacy:
 > - Every proof file is sent **in plain text** to Axiom's cloud servers to be checked.
 > - The receipts, Merkle root and OP_RETURN data are **public**, and so are the proof files.
@@ -88,6 +94,7 @@ All 15 files pass AXLE (57 theorems in total). Results are in [`results/`](resul
 
 ## Check a receipt in your browser
 
+Live at https://bsvkey.github.io/bsvkey-axiom-proofs/ .
 [`index.html`](index.html) checks any proof against its receipt and the
 on-chain root with nothing installed: it hashes the file with Web Crypto,
 rebuilds the receipt leaf, climbs the Merkle path and reads the transaction
@@ -118,16 +125,23 @@ Before anything is sent, [`tools/lean_guard.py`](tools/lean_guard.py) refuses
 files that use metaprogramming (`run_cmd`, `#eval`, `elab`, `macro`, `open Lean`),
 `unsafe` code, `implemented_by`, extra axioms, `native_decide`, checker
 options or imports other than Mathlib. Receipts are only for plain definitions
-and theorems, the same rule many proof competitions use. It is defense in
-depth on top of AXLE, and it runs in the Action too.
+and theorems, the same rule many proof competitions use. It blocks the trick
+in [ADVISORY.md](ADVISORY.md), and it runs in the Action too.
 
 ## Soundness tests of AXLE
 
 [`soundness/`](soundness) holds adversarial cases: files that try to make
 `verify_proof` accept a false or unproven claim (hidden `sorry`, custom axioms,
 `native_decide`, weaker or renamed statements, redefined definitions, instance,
-notation and macro overrides of `+`, `#exit`, `opaque` and `unsafe` tricks),
-plus honest controls that must pass. AXLE handled all of them correctly.
+notation and macro overrides of `+`, `#exit`, `opaque` and `unsafe` tricks,
+and two metaprograms that add a theorem with the kernel check turned off),
+plus honest controls that must pass.
+
+**Result: 19 of 21 handled correctly. AXLE accepted both kernel-skipping
+proofs of `False`.** See [ADVISORY.md](ADVISORY.md). Known cases print `KNOWN`
+and turn into `FIXED` once AXLE rejects them; any new hole fails the run.
+[`soundness/kernel-replay/`](soundness/kernel-replay) shows Lean's own
+`leanchecker` rejecting the same file.
 
 ```powershell
 python soundness\run_soundness.py

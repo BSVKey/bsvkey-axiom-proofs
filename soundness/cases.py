@@ -121,6 +121,43 @@ CASES = [
         content="set_option debug.skipKernelTC true in\ntheorem t : 2 + 2 = 5 := by decide",
     ),
     dict(
+        # A metaprogram adds `t : False` with a bogus proof and the kernel check
+        # turned off. See ADVISORY.md: AXLE accepts this.
+        name="add_decl_core_no_check",
+        expect="reject",
+        known_issue=True,
+        statement="theorem t : False := by sorry",
+        content=(
+            "abbrev Claim : Prop := False\n"
+            "open Lean Elab Command in\n"
+            "run_cmd do\n"
+            "  let ty := ((← getEnv).find? ``Claim).get!.value!\n"
+            "  let decl := Declaration.thmDecl { name := `t, levelParams := [], type := ty, "
+            "value := mkConst ``True.intro }\n"
+            "  match (← getEnv).addDeclCore 0 0 decl none (doCheck := false) with\n"
+            "  | .ok env' => setEnv env'\n"
+            "  | .error _ => throwError \"rejected\""
+        ),
+    ),
+    dict(
+        # Same bogus theorem, inserted straight into the kernel environment.
+        name="kernel_env_without_checking",
+        expect="reject",
+        known_issue=True,
+        statement="theorem t : False := by sorry",
+        content=(
+            "abbrev Claim : Prop := False\n"
+            "open Lean Elab Command in\n"
+            "run_cmd do\n"
+            "  let ty := ((← getEnv).find? ``Claim).get!.value!\n"
+            "  let decl := Declaration.thmDecl { name := `t, levelParams := [], type := ty, "
+            "value := mkConst ``True.intro }\n"
+            "  match (← getEnv).toKernelEnv.addDeclWithoutChecking decl with\n"
+            "  | .ok kenv => setEnv (Environment.ofKernelEnv kenv)\n"
+            "  | .error _ => throwError \"rejected\""
+        ),
+    ),
+    dict(
         name="unsafe_cast",
         expect="reject",
         statement="theorem t : 2 + 2 = 5 := by sorry",
