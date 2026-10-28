@@ -6,7 +6,9 @@
 
 > **Advisory (2026-10-28):** AXLE's `verify_proof` can be made to accept a
 > proof of `False`. Details, reproduction and the fix: [ADVISORY.md](ADVISORY.md).
-> Our 15 proofs are unaffected: none use metaprogramming, and the guard refuses any file that does.
+> Our 15 proofs are unaffected: none use metaprogramming, the guard refuses any file that does,
+> and all 15 pass an [independent kernel replay](#independent-kernel-replay) with the official
+> Lean 4.35.0 and Mathlib v4.35.0 ([CI run](https://github.com/BSVKey/bsvkey-axiom-proofs/actions/runs/40689665073)).
 
 > **Check the receipts in your browser:** https://bsvkey.github.io/bsvkey-axiom-proofs/
 
@@ -128,6 +130,40 @@ options or imports other than Mathlib. Receipts are only for plain definitions
 and theorems, the same rule many proof competitions use. It blocks the trick
 in [ADVISORY.md](ADVISORY.md), and it runs in the Action too.
 
+## Independent kernel replay
+
+The `kernel` job in [CI](.github/workflows/test.yml) checks the 15 proofs
+without AXLE, on every push, on GitHub's own runner:
+
+1. [`tools/kernel_project.py`](tools/kernel_project.py) copies each file byte for
+   byte into a Lake library ([`kernel/`](kernel)), for example
+   `proofs/01_payment_channel.lean` to `kernel/Proofs/P01_payment_channel.lean`
+   (Lean module names cannot start with a digit). The files in `proofs/` are not
+   changed, so the anchored hashes still match.
+2. [`leanprover/lean-action`](https://github.com/leanprover/lean-action) builds them
+   with the official Lean 4.35.0 and Mathlib v4.35.0 (Mathlib's prebuilt cache).
+3. `leanchecker` replays every compiled declaration in the 15 modules through
+   Lean's kernel. Mathlib's own declarations are loaded as imports, not replayed.
+4. `axiom-audit` and `#print axioms` confirm that each of the 57 theorems uses only
+   `propext`, `Classical.choice` and `Quot.sound`. The job page shows a table.
+5. The same replay is run on the exploit from [ADVISORY.md](ADVISORY.md) and must
+   reject it, so the check is known to catch that trick.
+
+**Result:** [all 15 files and 57 theorems pass](https://github.com/BSVKey/bsvkey-axiom-proofs/actions/runs/40689665073)
+(run of 2026-10-28, commit `bf5251b`).
+
+To repeat it locally (PowerShell, Lean installed with elan):
+
+```powershell
+python tools\kernel_project.py
+cd kernel
+lake exe cache get
+lake build
+lake env leanchecker Proofs
+cd ..
+python tools\kernel_project.py --audit
+```
+
 ## Soundness tests of AXLE
 
 [`soundness/`](soundness) holds adversarial cases: files that try to make
@@ -154,8 +190,9 @@ python soundness\run_soundness.py
   matches the model. That link is checked by each product's own tests, not here.
 - Files 09 and 10 treat the hash function as ideal (collision resistant). They do
   not prove anything about SHA-256 itself.
-- A pass means Lean's kernel accepted the proof on Axiom's servers. You can re-check
-  any file yourself with a local Lean 4.35.0 and Mathlib install.
+- An AXLE pass means AXLE reported the proof as checked on Axiom's servers. The
+  [independent kernel replay](#independent-kernel-replay) re-checks every file with
+  Lean's own kernel on GitHub's runner, and you can repeat it on your own machine.
 
 ## Run it
 

@@ -56,7 +56,9 @@ Without it the trick still runs but fails AXLE's signature comparison.
 - **Anyone recording "verified by AXLE"**, including us: our 15 receipts
   anchored on Bitcoin BSV are unaffected because none of those files use
   metaprogramming, and the [guard](tools/lean_guard.py) now refuses any file
-  that does.
+  that does. All 15 also pass an independent kernel replay (`leanchecker`) and
+  axiom audit with the official Lean 4.35.0 and Mathlib v4.35.0, outside AXLE
+  ([CI run](https://github.com/BSVKey/bsvkey-axiom-proofs/actions/runs/40689665073)).
 
 ## What AXLE gets right
 
