@@ -1,0 +1,556 @@
+{
+  "schema": "bsvkey.proof-batch/1",
+  "merkle_root": "0c202fbb16fae97fbf0f3cc9d494e4fed2b597fb5a2e33cb3b87deb2e93ee2d0",
+  "op_return_script_hex": "006a0c6273766b65792e70726f6f66200c202fbb16fae97fbf0f3cc9d494e4fed2b597fb5a2e33cb3b87deb2e93ee2d0",
+  "anchor_txid": "7a3a0e4e77454d51fdb2091eac4899bcda3fbc09e84e8440fd1f88a759bbedae",
+  "receipts": [
+    {
+      "receipt": {
+        "file": "proofs/01_payment_channel.lean",
+        "source_sha256": "503eaa068ed6c3b517b12d780dde28d82b4b74630dbd5db1c833d03b9385aad6",
+        "statement_sha256": "467f2ea0e31df04724c987f325bf5322cdca7e756746ccec64d079301553f890",
+        "theorems": [
+          "pay_conserves",
+          "pay_no_overdraft",
+          "refund_conserves",
+          "run_conserves",
+          "step_conserves"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:57Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "a5bebec63532c2b311d876840a1802665f811fe10ac0fb7e3af393b8d48c50c5",
+      "path": [
+        {
+          "side": "right",
+          "hash": "85f9c45f9348aadc8a3072672aae58b10dcbd40681218e351b7eac3c072210b2"
+        },
+        {
+          "side": "right",
+          "hash": "e2e5020fc3129fb2551f48092d3a9542a9eaa9f9621717680cb5c835ae6795fc"
+        },
+        {
+          "side": "right",
+          "hash": "7c7e9891a01945ae606a3e54ba0748013d422712f9ffd9eb3d69693ebcb4adeb"
+        },
+        {
+          "side": "right",
+          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/02_paywall_pricing.lean",
+        "source_sha256": "378a42c80c831ea5f6afa9f253d3bbda1b6e6dcbd385b9862e54c5a1cde84002",
+        "statement_sha256": "471a9b80215bf79691f60f7c403ca4395d8bdf9ea62f0adbb45688b430c90514",
+        "theorems": [
+          "margin_tight",
+          "price_covers_margin",
+          "price_ge_floor",
+          "price_monotone"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:57Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "85f9c45f9348aadc8a3072672aae58b10dcbd40681218e351b7eac3c072210b2",
+      "path": [
+        {
+          "side": "left",
+          "hash": "a5bebec63532c2b311d876840a1802665f811fe10ac0fb7e3af393b8d48c50c5"
+        },
+        {
+          "side": "right",
+          "hash": "e2e5020fc3129fb2551f48092d3a9542a9eaa9f9621717680cb5c835ae6795fc"
+        },
+        {
+          "side": "right",
+          "hash": "7c7e9891a01945ae606a3e54ba0748013d422712f9ffd9eb3d69693ebcb4adeb"
+        },
+        {
+          "side": "right",
+          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/03_charge_first_refunds.lean",
+        "source_sha256": "257df934ed6169cd77055837b4646bcb063e50a4664940e23e119856a05a6502",
+        "statement_sha256": "ebe1158bffef7d8149ef54e665a45c9e706dbbd818a0f6006e9c4aaf79e42b8f",
+        "theorems": [
+          "charge_unchanged",
+          "fresh_order_safe",
+          "processAll_valid",
+          "requestRefund_valid"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:57Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "e67a47049fe1e835c4251eeda03cbb16ba7d13ad5563676acec3100091773695",
+      "path": [
+        {
+          "side": "right",
+          "hash": "1285a037ec32c01e4f61ccb29dfdd6447db92d5d001bf4e6a2c31c00a248fbdc"
+        },
+        {
+          "side": "left",
+          "hash": "91a663c0166ad30851adee1809c407ba186b6d64a684000b1dafea930abc5d03"
+        },
+        {
+          "side": "right",
+          "hash": "7c7e9891a01945ae606a3e54ba0748013d422712f9ffd9eb3d69693ebcb4adeb"
+        },
+        {
+          "side": "right",
+          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/04_governor_spend_cap.lean",
+        "source_sha256": "d9a79661545f6e23b3dc881131399c9e7b4465c783b00138930904dfc9611210",
+        "statement_sha256": "6d520e349a082da32ea8f0466569a58f29049fbf85795df46a7ecb7d7cdc512a",
+        "theorems": [
+          "handle_cap_fixed",
+          "handle_killed_fixed",
+          "handle_within_cap",
+          "killed_blocks_all",
+          "never_over_cap"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:57Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "1285a037ec32c01e4f61ccb29dfdd6447db92d5d001bf4e6a2c31c00a248fbdc",
+      "path": [
+        {
+          "side": "left",
+          "hash": "e67a47049fe1e835c4251eeda03cbb16ba7d13ad5563676acec3100091773695"
+        },
+        {
+          "side": "left",
+          "hash": "91a663c0166ad30851adee1809c407ba186b6d64a684000b1dafea930abc5d03"
+        },
+        {
+          "side": "right",
+          "hash": "7c7e9891a01945ae606a3e54ba0748013d422712f9ffd9eb3d69693ebcb4adeb"
+        },
+        {
+          "side": "right",
+          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/05_inference_metering.lean",
+        "source_sha256": "a09f493b3d034aeed24d5567b11f76d572e44ba25bf3be9a4484751acfa9a3d3",
+        "statement_sha256": "5662e66209e10b2170fe6ce2dc54b6b97baed865a3e1f00632b81e0daf878e2b",
+        "theorems": [
+          "bill_covers_cost",
+          "bill_monotone",
+          "bill_zero",
+          "msat_additive",
+          "split_overhead"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:58Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "e55352d3019b2bf46b2feeb629253ca827a1157fcec24b45d4026403f312033e",
+      "path": [
+        {
+          "side": "right",
+          "hash": "50378e9ab61b46e6c50846acb6095f13af203e1a22cd5cb1e9e30430174eb2bd"
+        },
+        {
+          "side": "right",
+          "hash": "d9749f1e78e400b7fe6c36c4dbe05e6195995e8e308c475bf71411cb44253ce8"
+        },
+        {
+          "side": "left",
+          "hash": "9022ae1eb05d61a2833de3507ae8e22082ceadd55db4e364c9cd08d94d992356"
+        },
+        {
+          "side": "right",
+          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/06_fee_rake.lean",
+        "source_sha256": "afaa030ff0c0e1d2605d28c48be09bbf00f6cbcd5ccf37ef400648a837f7d56a",
+        "statement_sha256": "2ad10999c83d5283031743f26d3a6fc3543af903a7b56ffe1e21aea3435c0504",
+        "theorems": [
+          "fee_le_amount",
+          "fee_monotone",
+          "split_exact",
+          "zero_rake"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:35:12Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "50378e9ab61b46e6c50846acb6095f13af203e1a22cd5cb1e9e30430174eb2bd",
+      "path": [
+        {
+          "side": "left",
+          "hash": "e55352d3019b2bf46b2feeb629253ca827a1157fcec24b45d4026403f312033e"
+        },
+        {
+          "side": "right",
+          "hash": "d9749f1e78e400b7fe6c36c4dbe05e6195995e8e308c475bf71411cb44253ce8"
+        },
+        {
+          "side": "left",
+          "hash": "9022ae1eb05d61a2833de3507ae8e22082ceadd55db4e364c9cd08d94d992356"
+        },
+        {
+          "side": "right",
+          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/07_name_market_swap.lean",
+        "source_sha256": "170879b0a0c5b5c3ff7868085ee73fe1f5f8a330878764ab6c31c5ad47394b54",
+        "statement_sha256": "f0953e60e2439daf770e43d70fc003814b4ba337a0202bea8d5faccd152b620b",
+        "theorems": [
+          "atomic",
+          "money_conserved",
+          "must_pay",
+          "no_sig_no_move"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:58Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "3ace6e9e5da9adbd791bcf312bd767d5274f2a2622cb4a0c9287b1c7f953669e",
+      "path": [
+        {
+          "side": "right",
+          "hash": "28a445a42eadb2f0372a6b976c10d4307034271ea4d38a734c2a5c436fd4a239"
+        },
+        {
+          "side": "left",
+          "hash": "8b219a678b324c0562619a36eea75c5b33b60e8425da1453c4599d43730d9c48"
+        },
+        {
+          "side": "left",
+          "hash": "9022ae1eb05d61a2833de3507ae8e22082ceadd55db4e364c9cd08d94d992356"
+        },
+        {
+          "side": "right",
+          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/08_key_name_registry.lean",
+        "source_sha256": "38923884824792143d4bc6d0544bcd06d7ce891934514ca0b83b07a4ddc49777",
+        "statement_sha256": "9474563fe7f4b9fbbc00c29674aa0e5dbd0b9f4c1d8c0ba9482c802d03b0e057",
+        "theorems": [
+          "no_double_owner",
+          "registerAll_unique",
+          "register_unique",
+          "stranger_cannot_transfer"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:58Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "28a445a42eadb2f0372a6b976c10d4307034271ea4d38a734c2a5c436fd4a239",
+      "path": [
+        {
+          "side": "left",
+          "hash": "3ace6e9e5da9adbd791bcf312bd767d5274f2a2622cb4a0c9287b1c7f953669e"
+        },
+        {
+          "side": "left",
+          "hash": "8b219a678b324c0562619a36eea75c5b33b60e8425da1453c4599d43730d9c48"
+        },
+        {
+          "side": "left",
+          "hash": "9022ae1eb05d61a2833de3507ae8e22082ceadd55db4e364c9cd08d94d992356"
+        },
+        {
+          "side": "right",
+          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/09_receipt_hash_chain.lean",
+        "source_sha256": "8b3494529121c08cb4a7eb261267ccaf24af802d75dbed021f42c071892c39d3",
+        "statement_sha256": "733ae1934fe50cb0a3486b57a48c1120f47f6db84c530df473a5a116c21fe92e",
+        "theorems": [
+          "head_determines_chain",
+          "tamper_detected"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:58Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "bcd826d3ae7fca21de4da2b17b61877b875f39ca177050ddb88e80be44f41ef9",
+      "path": [
+        {
+          "side": "right",
+          "hash": "121192b762e87820bf683c686ac4bbe1a71f0c5f394e04c150dca45c36c17b3a"
+        },
+        {
+          "side": "right",
+          "hash": "4c4c599038b27385a96f7a9b6be496b8468807b32c647dcdd779e6fdf70ebaa7"
+        },
+        {
+          "side": "right",
+          "hash": "4d5d453f55a6cfe5c3ed7059b6288f9d053c811792fc822073be239f4984578c"
+        },
+        {
+          "side": "left",
+          "hash": "18bb042d78542b37a6c0cc008c874e44b5daeeb535f29ffcce09951be994fd5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/10_merkle_batch.lean",
+        "source_sha256": "e4074b2db29e7cde028630e2bcb27d709a368ff623707c385f04329ee4f23207",
+        "statement_sha256": "db411f002d1b0e8f9c0b22bfb640274b7cdad2716e2169bdbbce384136445d6d",
+        "theorems": [
+          "climb_append",
+          "path_exists",
+          "root_binding"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:58Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "121192b762e87820bf683c686ac4bbe1a71f0c5f394e04c150dca45c36c17b3a",
+      "path": [
+        {
+          "side": "left",
+          "hash": "bcd826d3ae7fca21de4da2b17b61877b875f39ca177050ddb88e80be44f41ef9"
+        },
+        {
+          "side": "right",
+          "hash": "4c4c599038b27385a96f7a9b6be496b8468807b32c647dcdd779e6fdf70ebaa7"
+        },
+        {
+          "side": "right",
+          "hash": "4d5d453f55a6cfe5c3ed7059b6288f9d053c811792fc822073be239f4984578c"
+        },
+        {
+          "side": "left",
+          "hash": "18bb042d78542b37a6c0cc008c874e44b5daeeb535f29ffcce09951be994fd5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/11_wallet_idle_lock.lean",
+        "source_sha256": "b9d8022c5485c610db916cd2aac1fd74a70e18126aed8b892407ba801c49e33c",
+        "statement_sha256": "3ee804181bb7a585822c9332b070d520df576bd13741e255db104504e9848156",
+        "theorems": [
+          "active_stays_open",
+          "idle_locks",
+          "lock_is_sticky"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:58Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "fbc80a73ce30f6027a0ecd91bd438e5671c319370a0493497a7cfbbd164e2f0f",
+      "path": [
+        {
+          "side": "right",
+          "hash": "850cdfebe9a23b1afe0d5a65e0cd2319e10757a93dc354efd24e34f55bba55c2"
+        },
+        {
+          "side": "left",
+          "hash": "d92e81dbf6a2d9c573b5c5d47eef44d2a58dec63ffe21f9effc9647c914281dc"
+        },
+        {
+          "side": "right",
+          "hash": "4d5d453f55a6cfe5c3ed7059b6288f9d053c811792fc822073be239f4984578c"
+        },
+        {
+          "side": "left",
+          "hash": "18bb042d78542b37a6c0cc008c874e44b5daeeb535f29ffcce09951be994fd5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/12_dtn_custody_chain.lean",
+        "source_sha256": "d5508ac6281cbb52e300ba6daf238b5a2e886af5e9efcec8c6619fc0e4aea113",
+        "statement_sha256": "450db63767abf95829f2c2cd332556a2d96a4e4c521ace127f8bf64a26eb6e02",
+        "theorems": [
+          "final_is_last_dst",
+          "gap_detected",
+          "splice",
+          "valid_tail"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:58Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "850cdfebe9a23b1afe0d5a65e0cd2319e10757a93dc354efd24e34f55bba55c2",
+      "path": [
+        {
+          "side": "left",
+          "hash": "fbc80a73ce30f6027a0ecd91bd438e5671c319370a0493497a7cfbbd164e2f0f"
+        },
+        {
+          "side": "left",
+          "hash": "d92e81dbf6a2d9c573b5c5d47eef44d2a58dec63ffe21f9effc9647c914281dc"
+        },
+        {
+          "side": "right",
+          "hash": "4d5d453f55a6cfe5c3ed7059b6288f9d053c811792fc822073be239f4984578c"
+        },
+        {
+          "side": "left",
+          "hash": "18bb042d78542b37a6c0cc008c874e44b5daeeb535f29ffcce09951be994fd5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/13_paid_dm_gate.lean",
+        "source_sha256": "a429c0ccca77482d64addf069404f957686d1f31942fa01039c29ae032387007",
+        "statement_sha256": "254f4666b0ef4b55b0cf1cdba30c5d943999fe72a02400e3846c1da9c50f2942",
+        "theorems": [
+          "delivered_paid",
+          "higher_price_fewer",
+          "revenue_floor"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:59Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "6678e17b8aecc7efcb20b97b9b5b528a0518d738afafbb702deb7b271cb60f57",
+      "path": [
+        {
+          "side": "right",
+          "hash": "3c6cd2da253ec3d8be1bf35ea45fa1f62964f4440bf1fd15a3c84f8bd56dfb8a"
+        },
+        {
+          "side": "right",
+          "hash": "0f6e1fae1e7b5f31f2f31878f431539bd660a2c8c1291534b153c6b31739bf21"
+        },
+        {
+          "side": "left",
+          "hash": "e0114023e3d83200349c854430860088b4af43c2259937ae45cec777f4303e93"
+        },
+        {
+          "side": "left",
+          "hash": "18bb042d78542b37a6c0cc008c874e44b5daeeb535f29ffcce09951be994fd5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/14_reserve_receipts.lean",
+        "source_sha256": "8114e60424d020ea9178ec748d8c68b98627b7876e22ee74114ad83afaee0105",
+        "statement_sha256": "73c6ae04af373f00da5560c580e80695f4d6ad47518580736154e666381deb5f",
+        "theorems": [
+          "always_solvent",
+          "deposit_solvent",
+          "sum_set",
+          "withdraw_solvent"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:59Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "3c6cd2da253ec3d8be1bf35ea45fa1f62964f4440bf1fd15a3c84f8bd56dfb8a",
+      "path": [
+        {
+          "side": "left",
+          "hash": "6678e17b8aecc7efcb20b97b9b5b528a0518d738afafbb702deb7b271cb60f57"
+        },
+        {
+          "side": "right",
+          "hash": "0f6e1fae1e7b5f31f2f31878f431539bd660a2c8c1291534b153c6b31739bf21"
+        },
+        {
+          "side": "left",
+          "hash": "e0114023e3d83200349c854430860088b4af43c2259937ae45cec777f4303e93"
+        },
+        {
+          "side": "left",
+          "hash": "18bb042d78542b37a6c0cc008c874e44b5daeeb535f29ffcce09951be994fd5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/15_x402_settlement.lean",
+        "source_sha256": "3a0cc173a4a8c64f8ccd38db25a1c3ccf2c9ecd5719827b25f1dc1be6d5142e2",
+        "statement_sha256": "6bb4bcce69d29a49e80ebf9938bc1e4de9e8f1673a6899ea30d57dbb27d1e42a",
+        "theorems": [
+          "rejected_is_final",
+          "serve_needs_accept",
+          "served_implies_accepted"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-28T11:33:59Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "0f6e1fae1e7b5f31f2f31878f431539bd660a2c8c1291534b153c6b31739bf21",
+      "path": [
+        {
+          "side": "left",
+          "hash": "d2205c72fa12c3b4bf4f9db8a4cc16309d88719609a3e4411099b9ac41abe34d"
+        },
+        {
+          "side": "left",
+          "hash": "e0114023e3d83200349c854430860088b4af43c2259937ae45cec777f4303e93"
+        },
+        {
+          "side": "left",
+          "hash": "18bb042d78542b37a6c0cc008c874e44b5daeeb535f29ffcce09951be994fd5c"
+        }
+      ]
+    }
+  ]
+}

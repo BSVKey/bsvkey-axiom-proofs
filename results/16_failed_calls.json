@@ -1,0 +1,21 @@
+{
+  "file": "proofs/16_failed_calls.lean",
+  "source_sha256": "4f59f38adcf2046c0a2384e206492b7d2588a038092deb4652a30ce34584f3bd",
+  "statement_sha256": "50c1a3001dadf99dd7f549e00970fe7c60f20841d1581386e9a160e6d1252786",
+  "theorems": [
+    "charge_covers_cost",
+    "charge_le_delivered_plus_allowance",
+    "charged_at_least_min",
+    "cut_short_le_finished",
+    "provider_error_free",
+    "timeout_same_as_done",
+    "zero_tokens_cost_min"
+  ],
+  "environment": "lean-4.35.0",
+  "checker": "AXLE verify_proof",
+  "axle_client": "1.9.0",
+  "okay": true,
+  "failed_declarations": [],
+  "errors": [],
+  "checked_at": "2026-10-30T19:51:24Z"
+}

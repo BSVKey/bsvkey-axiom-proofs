@@ -6,8 +6,8 @@
 
 > **Advisory (2026-10-28):** AXLE's `verify_proof` can be made to accept a
 > proof of `False`. Details, reproduction and the fix: [ADVISORY.md](ADVISORY.md).
-> Our 15 proofs are unaffected: none use metaprogramming, the guard refuses any file that does,
-> and all 15 pass an [independent kernel replay](#independent-kernel-replay) with the official
+> Our 16 proofs are unaffected: none use metaprogramming, the guard refuses any file that does,
+> and all 16 pass an [independent kernel replay](#independent-kernel-replay) with the official
 > Lean 4.35.0 and Mathlib v4.35.0 ([CI run](https://github.com/BSVKey/bsvkey-axiom-proofs/actions/runs/40689665073)).
 
 > **Check the receipts in your browser:** https://bsvkey.github.io/bsvkey-axiom-proofs/
@@ -64,9 +64,9 @@ AxiomProver, the AI that writes proofs (used for Axiom's Classification of Finit
 Simple Groups formalization), is **not** publicly available and is not used here.
 Every proof in this repo was written by hand and only *checked* by AXLE.
 
-## The 15 BSVKey uses
+## The 16 BSVKey uses
 
-All 15 files pass AXLE (57 theorems in total). Results are in [`results/`](results).
+All 16 files pass AXLE (64 theorems in total). Results are in [`results/`](results).
 
 | # | BSVKey product | Proven property |
 |---|---|---|
@@ -74,7 +74,7 @@ All 15 files pass AXLE (57 theorems in total). Results are in [`results/`](resul
 | 02 | Paywall Cloud pricing | Price never below the floor, always covers cost plus 3%, rounds up by under one satoshi, never falls when cost rises |
 | 03 | Paywall charge-first refunds | Total refunded never exceeds the charge, whatever refund requests arrive |
 | 04 | Governor AI spend firewall | Spend never passes the cap for any request stream; kill switch blocks everything |
-| 05 | Inference Broker metering | Bill always covers token cost; monotone in tokens; zero tokens is free; splitting a job costs at most 1 sat more |
+| 05 | Inference Broker metering | Bill always covers token cost; monotone in tokens; zero tokens is free; splitting a job costs at most 1 sat more (token counts only: the live broker adds a minimum charge and handles failures, see row 16) |
 | 06 | Fee rake (as in BSV Scribe) | Seller share plus fee equals the payment exactly; fee never exceeds the payment |
 | 07 | Name Market trades | A trade is all or nothing; no name without payment, no payment without the name; money conserved |
 | 08 | .key name registry | No name ever has two owners; a stranger cannot transfer someone else's name |
@@ -85,6 +85,12 @@ All 15 files pass AXLE (57 theorems in total). Results are in [`results/`](resul
 | 13 | Paid DMs and Contact Gauge | Every delivered message was paid in full to the right address; revenue is at least price times count |
 | 14 | Reserve receipts | Reserves still cover all balances after any deposits and withdrawals |
 | 15 | x402 settlement | Nothing is served unless a node accepted the payment; a rejected request is never served |
+| 16 | Inference Broker failed and partial calls | A provider error is never charged, even after tokens streamed; a timeout costs the same as a finished call with the same delivered tokens; cutting a call short never costs more than finishing it; the charge never exceeds delivered tokens plus the buyer's hidden-output allowance; every charged call costs at least the minimum (so zero tokens costs the minimum, not zero) |
+
+Row 16 was added on 2026-10-30 after a reader asked whether a call that fails
+partway is inside row 05's model. It was not: row 05 bills token counts and
+says nothing about how a call ends, and it has no minimum charge. Row 16 models
+both, matching the broker's code.
 
 ### Negative controls
 
@@ -100,7 +106,7 @@ Live at https://bsvkey.github.io/bsvkey-axiom-proofs/ .
 [`index.html`](index.html) checks any proof against its receipt and the
 on-chain root with nothing installed: it hashes the file with Web Crypto,
 rebuilds the receipt leaf, climbs the Merkle path and reads the transaction
-from WhatsOnChain. "Check all 15" runs every file. You can also drop your own
+from WhatsOnChain. "Check all 16" runs every file. You can also drop your own
 copy of a `.lean` file on it to see whether it is the exact file AXLE checked.
 Open it from a local copy of the repo with any static server, for example
 `python -m http.server --directory .`
@@ -132,7 +138,7 @@ in [ADVISORY.md](ADVISORY.md), and it runs in the Action too.
 
 ## Independent kernel replay
 
-The `kernel` job in [CI](.github/workflows/test.yml) checks the 15 proofs
+The `kernel` job in [CI](.github/workflows/test.yml) checks the 16 proofs
 without AXLE, on every push, on GitHub's own runner:
 
 1. [`tools/kernel_project.py`](tools/kernel_project.py) copies each file byte for
@@ -142,15 +148,16 @@ without AXLE, on every push, on GitHub's own runner:
    changed, so the anchored hashes still match.
 2. [`leanprover/lean-action`](https://github.com/leanprover/lean-action) builds them
    with the official Lean 4.35.0 and Mathlib v4.35.0 (Mathlib's prebuilt cache).
-3. `leanchecker` replays every compiled declaration in the 15 modules through
+3. `leanchecker` replays every compiled declaration in the 16 modules through
    Lean's kernel. Mathlib's own declarations are loaded as imports, not replayed.
-4. `axiom-audit` and `#print axioms` confirm that each of the 57 theorems uses only
+4. `axiom-audit` and `#print axioms` confirm that each of the 64 theorems uses only
    `propext`, `Classical.choice` and `Quot.sound`. The job page shows a table.
 5. The same replay is run on the exploit from [ADVISORY.md](ADVISORY.md) and must
    reject it, so the check is known to catch that trick.
 
 **Result:** [all 15 files and 57 theorems pass](https://github.com/BSVKey/bsvkey-axiom-proofs/actions/runs/40689665073)
-(run of 2026-10-28, commit `bf5251b`).
+(run of 2026-10-28, commit `bf5251b`). Row 16 is replayed on every push since
+2026-10-30: see the latest [`test` run](https://github.com/BSVKey/bsvkey-axiom-proofs/actions/workflows/test.yml).
 
 To repeat it locally (PowerShell, Lean installed with elan):
 
@@ -213,18 +220,25 @@ the unit tests run offline. Set `AXLE_API_KEY` for higher rate limits.
 
 ## Anchoring on Bitcoin BSV
 
-Current batch ([`receipts/batch.json`](receipts/batch.json)):
+Current batch ([`receipts/batch.json`](receipts/batch.json), 16 receipts):
 
-- Merkle root: `0c202fbb16fae97fbf0f3cc9d494e4fed2b597fb5a2e33cb3b87deb2e93ee2d0`
+- Merkle root: `e4b67dc1db0a6c1a250380e68e29f8d0a0d5079f7e57a99db431d58636a3ed21`
 - OP_RETURN script: `OP_FALSE OP_RETURN "bsvkey.proof" <root>`
 - Anchored on Bitcoin BSV mainnet in transaction
-  [`7a3a0e4e77454d51fdb2091eac4899bcda3fbc09e84e8440fd1f88a759bbedae`](https://whatsonchain.com/tx/7a3a0e4e77454d51fdb2091eac4899bcda3fbc09e84e8440fd1f88a759bbedae)
-  (broadcast 2026-10-28, one input, 25 sat fee).
+  [`116140e0ed3c1d2b0a46825128d88a032003bed08ad3fc3d8147c340c825b2cf`](https://whatsonchain.com/tx/116140e0ed3c1d2b0a46825128d88a032003bed08ad3fc3d8147c340c825b2cf)
+  (broadcast 2026-10-30, one input, 25 sat fee). Its input is the change output
+  of the first anchor, so the two anchors are linked on chain.
 
-Anyone can check any proof file against that transaction:
+First batch ([`receipts/batch-2026-10-28.json`](receipts/batch-2026-10-28.json), files 01 to 15):
+root `0c202fbb16fae97fbf0f3cc9d494e4fed2b597fb5a2e33cb3b87deb2e93ee2d0`, anchored in
+[`7a3a0e4e77454d51fdb2091eac4899bcda3fbc09e84e8440fd1f88a759bbedae`](https://whatsonchain.com/tx/7a3a0e4e77454d51fdb2091eac4899bcda3fbc09e84e8440fd1f88a759bbedae)
+(2026-10-28). Those 15 receipts are byte for byte the same in the new batch;
+only the root changed because a 16th leaf was added.
+
+Anyone can check any proof file against the current transaction:
 
 ```powershell
-python tools\proof_receipt.py verify proofs\04_governor_spend_cap.lean --txid 7a3a0e4e77454d51fdb2091eac4899bcda3fbc09e84e8440fd1f88a759bbedae
+python tools\proof_receipt.py verify proofs\04_governor_spend_cap.lean --txid 116140e0ed3c1d2b0a46825128d88a032003bed08ad3fc3d8147c340c825b2cf
 ```
 
 The tool never signs or broadcasts. To anchor a new batch, pay for one

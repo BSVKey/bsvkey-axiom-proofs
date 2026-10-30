@@ -69,7 +69,7 @@
     <div class="drop" id="drop">Or drop your own copy of a <code>.lean</code> file here to check that copy instead.</div>
     <div class="row">
       <button id="run" disabled>2. Check it</button>
-      <button id="all" class="ghost" disabled>Check all 15</button>
+      <button id="all" class="ghost" disabled>Check all</button>
     </div>
   </div>
 
@@ -210,7 +210,7 @@ on-chain    = transaction output: OP_FALSE OP_RETURN "bsvkey.proof" &lt;root&gt;
     }
     render(`${steps.filter(s => s.ok).length} of ${steps.length} proofs match the anchored batch`, steps,
            ok => ok ? "Every published proof is exactly what AXLE checked and what the transaction commits to." : "See the failed rows above.");
-    $("all").disabled = false; $("all").textContent = "Check all 15";
+    $("all").disabled = false; $("all").textContent = `Check all ${batch.receipts.length}`;
   }
 
   const drop = $("drop");
@@ -233,7 +233,7 @@ on-chain    = transaction output: OP_FALSE OP_RETURN "bsvkey.proof" &lt;root&gt;
     batch = b;
     $("pick").innerHTML = b.receipts.map((e, i) =>
       `<option value="${i}">${e.receipt.file.replace("proofs/", "")} (${e.receipt.theorems.length} theorems)</option>`).join("");
-    $("run").disabled = false; $("all").disabled = false;
+    $("run").disabled = false; $("all").disabled = false; $("all").textContent = `Check all ${b.receipts.length}`;
   }).catch(e => { $("pick").innerHTML = `<option>Could not load receipts: ${e.message}</option>`; });
 })();
 </script>

@@ -11,12 +11,12 @@ import kernel_project as k  # noqa: E402
 
 
 class KernelProjectTests(unittest.TestCase):
-    def test_finds_all_57_theorems(self):
+    def test_finds_all_64_theorems(self):
         files = sorted((ROOT / "proofs").glob("*.lean"))
         names = [n for f in files for n in k.theorems(f)]
-        self.assertEqual(len(files), 15)
-        self.assertEqual(len(names), 57)
-        self.assertEqual(len(set(names)), 57)
+        self.assertEqual(len(files), 16)
+        self.assertEqual(len(names), 64)
+        self.assertEqual(len(set(names)), 64)
         self.assertIn("BSVKey.Channel.pay_conserves", names)
 
     def test_module_names_are_valid(self):

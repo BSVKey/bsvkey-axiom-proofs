@@ -1,8 +1,8 @@
 {
   "schema": "bsvkey.proof-batch/1",
-  "merkle_root": "0c202fbb16fae97fbf0f3cc9d494e4fed2b597fb5a2e33cb3b87deb2e93ee2d0",
-  "op_return_script_hex": "006a0c6273766b65792e70726f6f66200c202fbb16fae97fbf0f3cc9d494e4fed2b597fb5a2e33cb3b87deb2e93ee2d0",
-  "anchor_txid": "7a3a0e4e77454d51fdb2091eac4899bcda3fbc09e84e8440fd1f88a759bbedae",
+  "merkle_root": "e4b67dc1db0a6c1a250380e68e29f8d0a0d5079f7e57a99db431d58636a3ed21",
+  "op_return_script_hex": "006a0c6273766b65792e70726f6f6620e4b67dc1db0a6c1a250380e68e29f8d0a0d5079f7e57a99db431d58636a3ed21",
+  "anchor_txid": "116140e0ed3c1d2b0a46825128d88a032003bed08ad3fc3d8147c340c825b2cf",
   "receipts": [
     {
       "receipt": {
@@ -38,7 +38,7 @@
         },
         {
           "side": "right",
-          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+          "hash": "896fd4fb1d975b7505e0594aa8054330fbe2db798615b3e9dc318311c30cd9e9"
         }
       ]
     },
@@ -75,7 +75,7 @@
         },
         {
           "side": "right",
-          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+          "hash": "896fd4fb1d975b7505e0594aa8054330fbe2db798615b3e9dc318311c30cd9e9"
         }
       ]
     },
@@ -112,7 +112,7 @@
         },
         {
           "side": "right",
-          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+          "hash": "896fd4fb1d975b7505e0594aa8054330fbe2db798615b3e9dc318311c30cd9e9"
         }
       ]
     },
@@ -150,7 +150,7 @@
         },
         {
           "side": "right",
-          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+          "hash": "896fd4fb1d975b7505e0594aa8054330fbe2db798615b3e9dc318311c30cd9e9"
         }
       ]
     },
@@ -188,7 +188,7 @@
         },
         {
           "side": "right",
-          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+          "hash": "896fd4fb1d975b7505e0594aa8054330fbe2db798615b3e9dc318311c30cd9e9"
         }
       ]
     },
@@ -225,7 +225,7 @@
         },
         {
           "side": "right",
-          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+          "hash": "896fd4fb1d975b7505e0594aa8054330fbe2db798615b3e9dc318311c30cd9e9"
         }
       ]
     },
@@ -262,7 +262,7 @@
         },
         {
           "side": "right",
-          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+          "hash": "896fd4fb1d975b7505e0594aa8054330fbe2db798615b3e9dc318311c30cd9e9"
         }
       ]
     },
@@ -299,7 +299,7 @@
         },
         {
           "side": "right",
-          "hash": "95e96e4e7972bec7116ca09ae94e9eab2135ec75815ba64d4157cf627d8e5e5c"
+          "hash": "896fd4fb1d975b7505e0594aa8054330fbe2db798615b3e9dc318311c30cd9e9"
         }
       ]
     },
@@ -330,7 +330,7 @@
         },
         {
           "side": "right",
-          "hash": "4d5d453f55a6cfe5c3ed7059b6288f9d053c811792fc822073be239f4984578c"
+          "hash": "3ec8370c1ca473d41d1b2e8ac1460dbc94d7b668e9d0cb8959a225d0f5784374"
         },
         {
           "side": "left",
@@ -366,7 +366,7 @@
         },
         {
           "side": "right",
-          "hash": "4d5d453f55a6cfe5c3ed7059b6288f9d053c811792fc822073be239f4984578c"
+          "hash": "3ec8370c1ca473d41d1b2e8ac1460dbc94d7b668e9d0cb8959a225d0f5784374"
         },
         {
           "side": "left",
@@ -402,7 +402,7 @@
         },
         {
           "side": "right",
-          "hash": "4d5d453f55a6cfe5c3ed7059b6288f9d053c811792fc822073be239f4984578c"
+          "hash": "3ec8370c1ca473d41d1b2e8ac1460dbc94d7b668e9d0cb8959a225d0f5784374"
         },
         {
           "side": "left",
@@ -439,7 +439,7 @@
         },
         {
           "side": "right",
-          "hash": "4d5d453f55a6cfe5c3ed7059b6288f9d053c811792fc822073be239f4984578c"
+          "hash": "3ec8370c1ca473d41d1b2e8ac1460dbc94d7b668e9d0cb8959a225d0f5784374"
         },
         {
           "side": "left",
@@ -471,7 +471,7 @@
         },
         {
           "side": "right",
-          "hash": "0f6e1fae1e7b5f31f2f31878f431539bd660a2c8c1291534b153c6b31739bf21"
+          "hash": "55dd4191eeeb5801b45274742a1cf59db83066dee3c2aac2f1a6411c155ea417"
         },
         {
           "side": "left",
@@ -508,7 +508,7 @@
         },
         {
           "side": "right",
-          "hash": "0f6e1fae1e7b5f31f2f31878f431539bd660a2c8c1291534b153c6b31739bf21"
+          "hash": "55dd4191eeeb5801b45274742a1cf59db83066dee3c2aac2f1a6411c155ea417"
         },
         {
           "side": "left",
@@ -538,6 +538,50 @@
       },
       "leaf": "0f6e1fae1e7b5f31f2f31878f431539bd660a2c8c1291534b153c6b31739bf21",
       "path": [
+        {
+          "side": "right",
+          "hash": "200207c3a14537b3294aee4047c79aa049bad03f83c4394a7b74a1b046e72c97"
+        },
+        {
+          "side": "left",
+          "hash": "d2205c72fa12c3b4bf4f9db8a4cc16309d88719609a3e4411099b9ac41abe34d"
+        },
+        {
+          "side": "left",
+          "hash": "e0114023e3d83200349c854430860088b4af43c2259937ae45cec777f4303e93"
+        },
+        {
+          "side": "left",
+          "hash": "18bb042d78542b37a6c0cc008c874e44b5daeeb535f29ffcce09951be994fd5c"
+        }
+      ]
+    },
+    {
+      "receipt": {
+        "file": "proofs/16_failed_calls.lean",
+        "source_sha256": "4f59f38adcf2046c0a2384e206492b7d2588a038092deb4652a30ce34584f3bd",
+        "statement_sha256": "50c1a3001dadf99dd7f549e00970fe7c60f20841d1581386e9a160e6d1252786",
+        "theorems": [
+          "charge_covers_cost",
+          "charge_le_delivered_plus_allowance",
+          "charged_at_least_min",
+          "cut_short_le_finished",
+          "provider_error_free",
+          "timeout_same_as_done",
+          "zero_tokens_cost_min"
+        ],
+        "environment": "lean-4.35.0",
+        "checker": "AXLE verify_proof",
+        "okay": true,
+        "checked_at": "2026-10-30T19:51:24Z",
+        "schema": "bsvkey.proof-receipt/1"
+      },
+      "leaf": "200207c3a14537b3294aee4047c79aa049bad03f83c4394a7b74a1b046e72c97",
+      "path": [
+        {
+          "side": "left",
+          "hash": "0f6e1fae1e7b5f31f2f31878f431539bd660a2c8c1291534b153c6b31739bf21"
+        },
         {
           "side": "left",
           "hash": "d2205c72fa12c3b4bf4f9db8a4cc16309d88719609a3e4411099b9ac41abe34d"
