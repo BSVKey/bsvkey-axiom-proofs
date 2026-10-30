@@ -195,6 +195,10 @@ python soundness\run_soundness.py
 - Each file proves a property of a **model** of a BSVKey rule, written in Lean.
   It does **not** prove that the deployed code (JavaScript, TypeScript or Python)
   matches the model. That link is checked by each product's own tests, not here.
+  For row 16, the Inference Broker's test suite runs its real charge formula and
+  stream path through the same cases as the Lean model (provider error, timeout,
+  cut short, allowance cap, minimum). That repo is private, so this is our
+  statement, not something you can check here.
 - Files 09 and 10 treat the hash function as ideal (collision resistant). They do
   not prove anything about SHA-256 itself.
 - An AXLE pass means AXLE reported the proof as checked on Axiom's servers. The
