@@ -71,3 +71,5 @@ jobs:
       - run: python soundness/run_soundness.py
       - name: Proof files still match the committed receipts
         run: python -m unittest tests.test_receipts.CommittedBatchTests -v
+      - name: The live broker verifier still serves the formula row 16 is tested against
+        run: node tools/row16_published.mjs --live

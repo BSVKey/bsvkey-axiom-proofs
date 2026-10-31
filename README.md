@@ -198,7 +198,13 @@ python soundness\run_soundness.py
   For row 16, the Inference Broker's test suite runs its real charge formula and
   stream path through the same cases as the Lean model (provider error, timeout,
   cut short, allowance cap, minimum). That repo is private, so this is our
-  statement, not something you can check here.
+  statement, not something you can check here. What you can check: the broker
+  publishes its charge formula in its receipt verifier
+  (https://inference.bsvkey.com/js/verify.js), and
+  [`tools/row16_published.mjs`](tools/row16_published.mjs) runs that published
+  JavaScript against row 16's Lean definition on 5000 random cases (offline, on
+  every push). With `--live` it also checks the served file still has the same
+  function (weekly in CI). Discounts and web-search fees are held at zero.
 - Files 09 and 10 treat the hash function as ideal (collision resistant). They do
   not prove anything about SHA-256 itself.
 - An AXLE pass means AXLE reported the proof as checked on Axiom's servers. The
