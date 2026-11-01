@@ -53,6 +53,88 @@ jobs:
           fi
           echo "leanchecker rejected Exploit as expected"
 
+  action-kernel-replay:
+    # The Action's kernel-replay mode, with nothing sent to AXLE: our proofs must
+    # pass, and the AXLE exploit must fail.
+    name: action kernel replay (no AXLE)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Our 16 proofs pass (Mathlib)
+        uses: ./
+        with:
+          path: proofs
+          axle: "false"
+          kernel-replay: "true"
+          results: results-kernel
+      - name: The exploit folder fails (Honest.lean + Exploit.lean, both declare `t`)
+        id: exploit
+        continue-on-error: true
+        uses: ./
+        with:
+          path: soundness/kernel-replay
+          axle: "false"
+          kernel-replay: "true"
+          results: results-exploit
+      - name: Exactly Exploit.lean was rejected, by the kernel
+        run: |
+          test "${{ steps.exploit.outcome }}" = "failure" || { echo "::error::kernel replay accepted the exploit"; exit 1; }
+          python - <<'EOF'
+          import json
+          r = {f["file"]: f for f in json.load(open("results-exploit/kernel.json"))["files"]}
+          assert r["Honest.lean"]["ok"], r["Honest.lean"]
+          assert not r["Exploit.lean"]["ok"] and "kernel" in r["Exploit.lean"]["replay"], r["Exploit.lean"]
+          print("Honest.lean passed; Exploit.lean rejected:", r["Exploit.lean"]["replay"])
+          EOF
+
+  checkers:
+    # The 21 soundness cases through other Lean checkers, on Linux so that
+    # `lake comparator` can build each solution in its bubblewrap sandbox.
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    name: compare Lean checkers on the soundness cases
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install Lean 4.35.0 (elan) and bubblewrap
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain leanprover/lean4:v4.35.0
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+          sudo apt-get install -y bubblewrap
+          # Ubuntu 24.04 blocks unprivileged user namespaces, which bwrap needs.
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - name: Build SafeVerify against Lean 4.35.0
+        id: safeverify
+        continue-on-error: true
+        run: |
+          git clone https://github.com/GasStationManager/SafeVerify.git "$RUNNER_TEMP/SafeVerify"
+          cd "$RUNNER_TEMP/SafeVerify"
+          git checkout "$(cat "$GITHUB_WORKSPACE/soundness/safeverify/COMMIT")"
+          cp "$GITHUB_WORKSPACE/soundness/safeverify/lakefile.lean" "$GITHUB_WORKSPACE/soundness/safeverify/lean-toolchain" .
+          rm -f lake-manifest.json
+          lake update && lake build safe_verify
+          echo "exe=$PWD/.lake/build/bin/safe_verify" >> "$GITHUB_OUTPUT"
+      - name: Run every case through each checker
+        run: |
+          if [ "${{ steps.safeverify.outcome }}" = "success" ]; then
+            python soundness/compare_checkers.py --checkers leanchecker,comparator,safeverify \
+              --safeverify "${{ steps.safeverify.outputs.exe }}"
+          else
+            echo "::warning::SafeVerify did not build on Lean 4.35.0; comparing without it"
+            python soundness/compare_checkers.py --checkers leanchecker,comparator
+          fi
+          cat soundness/CHECKERS.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: checkers
+          path: |
+            soundness/CHECKERS.md
+            soundness/checkers.json
+
   axle:
     # Sends the public proof files to Axiom's AXLE servers (no privacy).
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
@@ -66,6 +148,7 @@ jobs:
         uses: ./
         with:
           path: proofs
+          kernel-replay: "true"
       - run: python -m pip install -r requirements.txt
       - run: python tools/axle_negative.py
       - run: python soundness/run_soundness.py

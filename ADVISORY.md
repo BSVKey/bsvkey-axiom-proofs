@@ -80,6 +80,10 @@ declarations are trusted without a fresh kernel check.
    the kernel. On this exploit it reports
    `(kernel) declaration type mismatch, 't' has type True but it is expected to have type False`,
    while honest proofs pass. Demo: [`soundness/kernel-replay/`](soundness/kernel-replay).
+   Lean 4.35.0 also ships `lake comparator` and `lake check`, which build in
+   a sandbox, compare statements, audit axioms and replay through the kernel.
+   This repo's GitHub Action does the replay with `kernel-replay: "true"`
+   (see the [README](README.md#add-a-kernel-replay-recommended-for-files-you-did-not-write)).
 2. **Refuse environment-changing metaprogramming** in submitted content
    (`run_cmd`, `#eval`, `elab`, `macro`, `open Lean`, `unsafe`, ...), as
    [`tools/lean_guard.py`](tools/lean_guard.py) does. Defense in depth only;

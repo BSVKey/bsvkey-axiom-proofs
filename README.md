@@ -127,6 +127,42 @@ It checks every file with AXLE and writes a pass/fail table to the job page.
 No Lean install, no Mathlib build. **No privacy:** the files are sent in plain
 text to Axiom's servers, so only use it on code you would publish anyway.
 
+### Add a kernel replay (recommended for files you did not write)
+
+AXLE's `verify_proof` trusts that every declaration went through Lean's
+kernel. Axiom documents this as a deliberate tradeoff for speed
+([arXiv:2606.26442](https://arxiv.org/abs/2606.26442), Appendix C.3), so a file
+that adds a theorem with the kernel check turned off passes
+([ADVISORY.md](ADVISORY.md)). Their report recommends adding a strict check for
+adversarial or outside code. `kernel-replay: "true"` adds one on the same runner:
+
+```yaml
+- uses: BSVKey/bsvkey-axiom-proofs@main
+  with:
+    path: proofs
+    kernel-replay: "true"   # compile with official Lean, replay through the kernel, audit axioms
+```
+
+After AXLE passes, [`tools/kernel_replay.py`](tools/kernel_replay.py) copies
+each file byte for byte into its own module of a Lake project, builds it with
+the official Lean toolchain matching `environment` (and Mathlib's prebuilt
+cache if a file imports Mathlib), replays every compiled declaration through
+the kernel with `leanchecker`, and checks that each theorem uses only
+`allowed-axioms`. Results go to `kernel.json` and the job page. It takes a few
+minutes more, mostly the Mathlib download.
+
+On our [soundness cases](#soundness-tests-of-axle) the two checks cover each
+other: AXLE rejects all 13 cheats that kernel replay alone lets through (such
+as `sorry`, extra axioms and weaker statements), and kernel replay rejects the
+2 kernel-skipping proofs that AXLE accepts. Together they get all 21 right. CI runs
+the Action in this mode on every push: our proofs must pass and the exploit
+must fail. With `axle: "false"` it runs only the kernel replay, with nothing
+sent to Axiom, but then nothing compares the statements, so use that only for
+files whose statements you already trust.
+
+The plain-Lean guard also blocks the exploit, but a deny list can miss things;
+the kernel replay does not depend on spotting the trick.
+
 ## Plain-Lean guard
 
 Before anything is sent, [`tools/lean_guard.py`](tools/lean_guard.py) refuses
@@ -188,6 +224,25 @@ and turn into `FIXED` once AXLE rejects them; any new hole fails the run.
 
 ```powershell
 python soundness\run_soundness.py
+```
+
+### The same cases through other checkers
+
+[`soundness/compare_checkers.py`](soundness/compare_checkers.py) runs all 21
+cases through other Lean checkers, each on a fresh Lake project:
+
+- `leanchecker`: kernel replay only (no statement comparison, no axiom check).
+- `lake comparator`: the strict judge built into Lean 4.35.0 (formerly
+  leanprover/comparator), run in its bubblewrap sandbox.
+- SafeVerify (GasStationManager/SafeVerify), rebuilt for Lean 4.35.0 with
+  [`soundness/safeverify/`](soundness/safeverify).
+
+AXLE's column comes from `results.json`. The `checkers` CI job (manual or
+weekly) runs it on Linux and writes the table to
+[`soundness/CHECKERS.md`](soundness/CHECKERS.md). Locally, without bubblewrap:
+
+```powershell
+python soundness\compare_checkers.py --checkers leanchecker
 ```
 
 ## What these proofs do and do not show
@@ -254,6 +309,18 @@ python tools\proof_receipt.py verify proofs\04_governor_spend_cap.lean --txid 11
 The tool never signs or broadcasts. To anchor a new batch, pay for one
 transaction with an output of the batch's script from a wallet you control,
 then set `anchor_txid` in `receipts/batch.json`.
+
+### Receipts that list every check (schema 2)
+
+A schema 1 receipt (both batches above) records that AXLE accepted the file.
+Given the `kernel.json` that the Action's kernel-replay mode writes,
+`proof_receipt.py build --kernel kernel.json --run <CI run URL>` builds
+schema 2 receipts instead. Each keeps every schema 1 field and adds a `checks`
+list: plain-Lean guard, AXLE `verify_proof`, kernel replay (`leanchecker`,
+Lean version, the CI run) and axiom audit (allowed and used axioms), each with
+its result. A file that failed any check gets no receipt. The browser checker
+shows the list. The anchored batches stay schema 1; a schema 2 batch needs a
+new anchor.
 
 That checks the file hash, the receipt, the Merkle path and the on-chain root
 through WhatsOnChain.

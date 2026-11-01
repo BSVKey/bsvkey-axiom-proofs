@@ -24,6 +24,25 @@ inputs:
   results:
     description: Folder to write one JSON result per file
     default: axle-results
+  axle:
+    description: >-
+      Run the plain-Lean guard and send the files to AXLE. Set "false" (with
+      kernel-replay "true") to check on this runner only, with nothing sent to Axiom.
+    default: "true"
+  kernel-replay:
+    description: >-
+      Also compile the files with the official Lean toolchain on this runner,
+      replay every declaration through Lean's kernel (leanchecker) and audit
+      each theorem's axioms. Catches files that add a theorem with the kernel
+      check turned off, which AXLE's verify_proof accepts by design. Slower:
+      installs Lean and, if a file imports Mathlib, Mathlib's prebuilt cache.
+    default: "false"
+  mathlib:
+    description: Kernel replay only. Add Mathlib to the Lake project (true, false or auto)
+    default: auto
+  allowed-axioms:
+    description: Kernel replay only. Comma-separated axioms each theorem may use
+    default: propext,Classical.choice,Quot.sound
 
 runs:
   using: composite
@@ -31,9 +50,14 @@ runs:
     - uses: actions/setup-python@v5
       with:
         python-version: "3.12"
-    - shell: bash
+    - if: inputs.axle != 'true' && inputs.kernel-replay != 'true'
+      shell: bash
+      run: echo "::error::axle and kernel-replay are both off, so nothing would be checked"; exit 1
+    - if: inputs.axle == 'true'
+      shell: bash
       run: python -m pip install --quiet -r "$GITHUB_ACTION_PATH/requirements.txt"
-    - shell: bash
+    - if: inputs.axle == 'true'
+      shell: bash
       env:
         AXLE_PROOFS_DIR: ${{ inputs.path }}
         AXLE_RESULTS_DIR: ${{ inputs.results }}
@@ -41,3 +65,30 @@ runs:
         AXLE_API_KEY: ${{ inputs.api-key }}
         AXLE_PARALLEL: ${{ inputs.parallel }}
       run: python "$GITHUB_ACTION_PATH/tools/axle_verify.py"
+
+    # ---- optional: independent kernel replay (no AXLE involved) ----
+    - if: inputs.kernel-replay == 'true'
+      id: kernel
+      shell: bash
+      env:
+        AXLE_PROOFS_DIR: ${{ inputs.path }}
+        AXLE_ENVIRONMENT: ${{ inputs.environment }}
+        KERNEL_DIR: .axle-kernel
+        KERNEL_MATHLIB: ${{ inputs.mathlib }}
+      run: python "$GITHUB_ACTION_PATH/tools/kernel_replay.py" prepare
+    - if: inputs.kernel-replay == 'true'
+      uses: leanprover/lean-action@v1.7.0
+      with:
+        lake-package-directory: .axle-kernel
+        use-mathlib-cache: ${{ steps.kernel.outputs.mathlib }}
+        build: "true"
+        test: "false"
+        lint: "false"
+    - if: inputs.kernel-replay == 'true'
+      shell: bash
+      env:
+        AXLE_RESULTS_DIR: ${{ inputs.results }}
+        AXLE_ENVIRONMENT: ${{ inputs.environment }}
+        KERNEL_DIR: .axle-kernel
+        KERNEL_AXIOMS: ${{ inputs.allowed-axioms }}
+      run: python "$GITHUB_ACTION_PATH/tools/kernel_replay.py" check

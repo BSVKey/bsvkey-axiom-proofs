@@ -6,3 +6,4 @@ venv/
 kernel/Proofs/
 kernel/Proofs.lean
 kernel/Audit.lean
+.axle-kernel/
