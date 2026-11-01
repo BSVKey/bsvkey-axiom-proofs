@@ -128,7 +128,7 @@ jobs:
             python soundness/compare_checkers.py --checkers leanchecker,comparator
           fi
           cat soundness/CHECKERS.md >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: checkers
