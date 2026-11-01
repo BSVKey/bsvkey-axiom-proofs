@@ -115,6 +115,7 @@ jobs:
           git checkout "$(cat "$GITHUB_WORKSPACE/soundness/safeverify/COMMIT")"
           cp "$GITHUB_WORKSPACE/soundness/safeverify/lakefile.lean" "$GITHUB_WORKSPACE/soundness/safeverify/lean-toolchain" .
           rm -f lake-manifest.json
+          python "$GITHUB_WORKSPACE/soundness/safeverify/patch.py" Main.lean
           lake update && lake build safe_verify
           echo "exe=$PWD/.lake/build/bin/safe_verify" >> "$GITHUB_OUTPUT"
       - name: Run every case through each checker

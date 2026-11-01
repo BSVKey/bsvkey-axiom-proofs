@@ -77,13 +77,21 @@ runs:
         KERNEL_MATHLIB: ${{ inputs.mathlib }}
       run: python "$GITHUB_ACTION_PATH/tools/kernel_replay.py" prepare
     - if: inputs.kernel-replay == 'true'
-      uses: leanprover/lean-action@v1.7.0
-      with:
-        lake-package-directory: .axle-kernel
-        use-mathlib-cache: ${{ steps.kernel.outputs.mathlib }}
-        build: "true"
-        test: "false"
-        lint: "false"
+      shell: bash
+      working-directory: .axle-kernel
+      env:
+        MATHLIB: ${{ steps.kernel.outputs.mathlib }}
+      run: |
+        # Official Lean via elan; the toolchain is the one in lean-toolchain.
+        if ! command -v lake >/dev/null; then
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.elan/bin:$PATH"
+        fi
+        lake update                                   # resolves dependencies, writes lake-manifest.json
+        if [ "$MATHLIB" = "true" ]; then lake exe cache get; fi   # Mathlib's prebuilt cache
+        lake build
     - if: inputs.kernel-replay == 'true'
       shell: bash
       env:

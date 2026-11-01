@@ -7,7 +7,7 @@ files with the official Lean toolchain, replays every compiled declaration
 through the kernel with `leanchecker`, and audits the axioms of every theorem.
 
     python tools/kernel_replay.py prepare   # write the Lake project
-    (lake build in that project; the Action uses leanprover/lean-action)
+    (lake update, lake exe cache get if Mathlib, lake build, all in that project)
     python tools/kernel_replay.py check     # leanchecker + axiom audit, per file
 
 Each file becomes its own module and is checked on its own, as AXLE checks
