@@ -150,7 +150,8 @@ on-chain    = transaction output: OP_FALSE OP_RETURN "bsvkey.proof" &lt;root&gt;
         `SHA-256 <span class="hash">${fileHash}</span>` + (fileHash === r.source_sha256 ? "" : `<br>receipt says <span class="hash">${r.source_sha256}</span>`));
     const leaf = await sha256(concat(new Uint8Array([0]), new TextEncoder().encode(canonical(r))));
     add(hex(leaf) === entry.leaf, "Receipt is intact",
-        `${r.theorems.length} theorems, checked ${r.checked_at} on ${r.environment} by ${r.checker}`);
+        `${r.theorems.length} theorems, checked ${r.checked_at} on ${r.environment} by ${r.checker}` +
+        (r.checks ? "<br>checks: " + r.checks.map(c => `${c.check} ${c.result}`).join(", ") : ""));
     let h = leaf;
     for (const s of entry.path) {
       const sib = unhex(s.hash);

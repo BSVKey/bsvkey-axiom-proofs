@@ -1,9 +1,16 @@
 """BSVKey proof receipts: batch AXLE results under one Merkle root for Bitcoin BSV.
 
-    python tools/proof_receipt.py build
+    python tools/proof_receipt.py build [--kernel results-kernel/kernel.json [--run URL]] [--out FILE]
         Reads results/*.json (from axle_verify.py). Every passing file becomes a
         receipt leaf. Writes receipts/batch.json with the Merkle root, each
         receipt's inclusion path, and the OP_RETURN output script to anchor.
+
+        With --kernel (kernel.json from tools/kernel_replay.py, as the Action's
+        kernel-replay mode writes it), receipts use schema 2 and list every check
+        that ran: the plain-Lean guard, AXLE verify_proof, the kernel replay and
+        the axiom audit, each with its result. A file that failed any check gets
+        no receipt. --run records the CI run where the kernel replay ran.
+        Schema 1 receipts (no --kernel) are unchanged.
 
     python tools/proof_receipt.py verify proofs/01_payment_channel.lean [--txid TXID]
         Re-hashes the proof file, finds its receipt, climbs the inclusion path
@@ -29,6 +36,7 @@ RESULTS = ROOT / "results"
 BATCH = ROOT / "receipts" / "batch.json"
 
 SCHEMA = "bsvkey.proof-receipt/1"
+SCHEMA_2 = "bsvkey.proof-receipt/2"
 TAG = b"bsvkey.proof"
 RECEIPT_FIELDS = (
     "file", "source_sha256", "statement_sha256", "theorems",
@@ -114,11 +122,46 @@ def receipt_from_result(result: dict) -> dict:
     return receipt
 
 
-def build_batch(results: list[dict]) -> dict:
-    receipts = sorted(
-        (receipt_from_result(r) for r in results if r.get("okay")),
-        key=lambda r: r["file"],
-    )
+def kernel_entry(kernel: dict, file: str) -> dict | None:
+    """The kernel.json row for a receipt's file ("proofs/x.lean" or "x.lean")."""
+    for row in kernel["files"]:
+        if file == row["file"] or file.endswith("/" + row["file"]):
+            return row
+    return None
+
+
+def receipt_v2(result: dict, kernel: dict, run_url: str | None) -> dict:
+    """Schema 2: schema 1's fields plus `checks`, one entry per check that ran.
+
+    A schema 1 receipt only says AXLE accepted the file. AXLE trusts that every
+    declaration went through the kernel (arXiv:2606.26442, Appendix C.3), so
+    schema 2 also records an independent kernel replay and axiom audit.
+    """
+    row = kernel_entry(kernel, result["file"])
+    if row is None:
+        raise ValueError(f"{result['file']}: not in kernel.json")
+    if not row["ok"]:
+        raise ValueError(f"{result['file']}: failed kernel replay or the axiom audit")
+    used = sorted({a for t in row["theorems"] for a in t["axioms"]})
+    replay = {"check": "kernel_replay", "tool": "leanchecker", "lean": kernel["lean"],
+              "result": "pass"}
+    if run_url:
+        replay["run"] = run_url
+    receipt = receipt_from_result(result)
+    receipt["schema"] = SCHEMA_2
+    receipt["checks"] = [
+        {"check": "lean_guard", "result": "pass"},
+        {"check": "axle_verify_proof", "environment": result["environment"], "result": "pass"},
+        replay,
+        {"check": "axiom_audit", "allowed": kernel["allowed_axioms"], "used": used,
+         "theorems": len(row["theorems"]), "result": "pass"},
+    ]
+    return receipt
+
+
+def build_batch(results: list[dict], kernel: dict | None = None, run_url: str | None = None) -> dict:
+    make = (lambda r: receipt_v2(r, kernel, run_url)) if kernel else receipt_from_result
+    receipts = sorted((make(r) for r in results if r.get("okay")), key=lambda r: r["file"])
     leaves = [leaf_hash(r) for r in receipts]
     levels = merkle_levels(leaves)
     root = levels[-1][0]
@@ -163,16 +206,22 @@ def fetch_tx_scripts(txid: str) -> list[bytes]:
     return [bytes.fromhex(v["scriptPubKey"]["hex"]) for v in tx["vout"]]
 
 
-def cmd_build(_args) -> int:
+def cmd_build(args) -> int:
     results = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(RESULTS.glob("*.json"))]
     failed = [r["file"] for r in results if not r.get("okay")]
     if failed:
         print("Not building: these files did not pass AXLE: " + ", ".join(failed))
         return 1
-    batch = build_batch(results)
-    BATCH.parent.mkdir(exist_ok=True)
-    BATCH.write_text(json.dumps(batch, indent=2) + "\n", encoding="utf-8")
-    print(f"{len(batch['receipts'])} receipts -> {BATCH.relative_to(ROOT)}")
+    kernel = json.loads(pathlib.Path(args.kernel).read_text(encoding="utf-8")) if args.kernel else None
+    try:
+        batch = build_batch(results, kernel, args.run)
+    except ValueError as e:
+        print(f"Not building: {e}")
+        return 1
+    out = pathlib.Path(args.out) if args.out else BATCH
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(batch, indent=2) + "\n", encoding="utf-8")
+    print(f"{len(batch['receipts'])} receipts (schema {2 if kernel else 1}) -> {out}")
     print(f"Merkle root:      {batch['merkle_root']}")
     print(f"OP_RETURN script: {batch['op_return_script_hex']}")
     return 0
@@ -196,7 +245,11 @@ def cmd_verify(args) -> int:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("build").set_defaults(fn=cmd_build)
+    b = sub.add_parser("build")
+    b.add_argument("--kernel", help="kernel.json from tools/kernel_replay.py: build schema 2 receipts")
+    b.add_argument("--run", help="URL of the CI run where the kernel replay ran")
+    b.add_argument("--out", help="write the batch here instead of receipts/batch.json")
+    b.set_defaults(fn=cmd_build)
     v = sub.add_parser("verify")
     v.add_argument("proof")
     v.add_argument("--txid")

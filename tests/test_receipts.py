@@ -125,5 +125,48 @@ class CommittedBatchTests(unittest.TestCase):
             self.assertEqual(pr.verify_file(batch, proof), [], proof.name)
 
 
+def fake_kernel(*files: str, bad: str | None = None) -> dict:
+    rows = [{"file": f, "module": "Proofs." + f, "replay": "ok", "ok": f != bad,
+             "theorems": [{"theorem": "t", "axioms": ["propext"] + (["cheat"] if f == bad else []),
+                           "bad_axioms": ["cheat"] if f == bad else []}]} for f in files]
+    return {"check": "kernel replay (leanchecker) + axiom audit", "lean": "4.35.0",
+            "allowed_axioms": ["Classical.choice", "Quot.sound", "propext"], "passed": bad is None,
+            "files": rows}
+
+
+class SchemaTwoTests(unittest.TestCase):
+    def test_lists_every_check(self):
+        batch = pr.build_batch([fake_result(1), fake_result(2)],
+                               fake_kernel("01_example.lean", "02_example.lean"),
+                               "https://github.com/x/y/actions/runs/1")
+        r = batch["receipts"][0]["receipt"]
+        self.assertEqual(r["schema"], pr.SCHEMA_2)
+        self.assertEqual([c["check"] for c in r["checks"]],
+                         ["lean_guard", "axle_verify_proof", "kernel_replay", "axiom_audit"])
+        self.assertTrue(all(c["result"] == "pass" for c in r["checks"]))
+        self.assertEqual(r["checks"][2]["run"], "https://github.com/x/y/actions/runs/1")
+        self.assertEqual(r["checks"][3]["used"], ["propext"])
+        # schema 1 fields are all still there, so old readers keep working
+        for k in pr.RECEIPT_FIELDS:
+            self.assertIn(k, r)
+
+    def test_kernel_failure_gives_no_batch(self):
+        with self.assertRaises(ValueError):
+            pr.build_batch([fake_result(1), fake_result(2)],
+                           fake_kernel("01_example.lean", "02_example.lean", bad="02_example.lean"))
+
+    def test_file_missing_from_kernel_gives_no_batch(self):
+        with self.assertRaises(ValueError):
+            pr.build_batch([fake_result(1), fake_result(2)], fake_kernel("01_example.lean"))
+
+    def test_schema_one_unchanged(self):
+        # The anchored batch was built without --kernel; its leaves must not move.
+        committed = json.loads((ROOT / "receipts" / "batch.json").read_text(encoding="utf-8"))
+        for e in committed["receipts"]:
+            self.assertEqual(e["receipt"]["schema"], pr.SCHEMA)
+            self.assertNotIn("checks", e["receipt"])
+            self.assertEqual(pr.leaf_hash(e["receipt"]).hex(), e["leaf"])
+
+
 if __name__ == "__main__":
     unittest.main()
