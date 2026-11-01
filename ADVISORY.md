@@ -4,9 +4,12 @@
 **Affects:** Axiom's AXLE (Axiom Lean Engine), `verify_proof`, environment
 `lean-4.35.0`, tested with the `axiom-axle` 1.9.0 client against
 https://axle.axiommath.ai. Other environments not tested.
-**Status:** reported to Axiom (axle@axiommath.ai) on the same day. Not fixed at
-the time of writing. Re-run [`soundness/run_soundness.py`](soundness/run_soundness.py)
-to see the current state: a fixed case prints `FIXED`.
+**Status:** reported to Axiom (axle@axiommath.ai) on 2026-10-28. Axiom replied
+on 2026-10-31: this is a known limitation and a deliberate design decision, kept
+for `verify_proof` throughput; it will not be fixed. See
+[Axiom's response](#axioms-response). Re-run
+[`soundness/run_soundness.py`](soundness/run_soundness.py) to see the current
+state: a fixed case prints `FIXED`.
 
 ## Summary
 
@@ -82,8 +85,30 @@ declarations are trusted without a fresh kernel check.
    [`tools/lean_guard.py`](tools/lean_guard.py) does. Defense in depth only;
    deny lists can miss things, the kernel replay cannot.
 
+## Axiom's response
+
+Axiom replied on 2026-10-31. They know about this limitation and chose it on
+purpose: a kernel replay fixes it but cuts `verify_proof` throughput, which
+they see as AXLE's main advantage over lean4checker, Comparator and SafeVerify.
+They leave it as an explicit gap rather than patching individual cases.
+
+Their technical report documents it
+([arXiv:2606.26442](https://arxiv.org/abs/2606.26442), submitted 2026-06-24).
+Section 5.2 says `verify_proof` trusts that declarations came through the
+normal kernel-checked path and compares its speed with the stricter checkers.
+Appendix C.3 shows an `addDeclCore` example with the kernel check off that
+`verify_proof` accepts and lean4checker rejects, and recommends adding a strict
+checker for adversarial or outside code.
+
+So this advisory describes documented behavior, not an undisclosed bug. We keep
+it up because many users may not read the appendix before treating `okay: true`
+as a kernel-checked result.
+
 ## If you use AXLE today
 
-Run the guard before sending files, and treat `okay: true` as "the statement
-matches and the elaborator was happy", not as "the kernel checked it", until
-Axiom confirms a fix.
+`verify_proof` will not catch this. If the proof files come from anyone you do
+not fully trust (a prover model being trained, a benchmark entry, an outside
+submitter), run the guard before sending files and replay accepted proofs
+through the kernel (`leanchecker`, Comparator or SafeVerify). Treat
+`okay: true` alone as "the statement matches and the elaborator was happy", not
+as "the kernel checked it".
