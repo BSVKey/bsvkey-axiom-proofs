@@ -239,7 +239,14 @@ cases through other Lean checkers, each on a fresh Lake project:
 
 AXLE's column comes from `results.json`. The `checkers` CI job (manual or
 weekly) runs it on Linux and writes the table to
-[`soundness/CHECKERS.md`](soundness/CHECKERS.md). Locally, without bubblewrap:
+[`soundness/CHECKERS.md`](soundness/CHECKERS.md).
+
+**Result (2026-11-01, Lean 4.35.0):** `lake comparator` and SafeVerify get
+all 21 right, AXLE 19 (it accepts the two kernel-skipping proofs of `False`),
+and `leanchecker` alone 8, since replay alone does not compare statements or
+check axioms. Comparator rejects `namespace_shadow` and `exit_early`, where the
+solution has no top-level `t`, by exiting with an error (code 134) rather than
+a clear message; the table lists every checker's reason. Locally, without bubblewrap:
 
 ```powershell
 python soundness\compare_checkers.py --checkers leanchecker

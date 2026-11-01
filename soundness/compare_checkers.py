@@ -147,7 +147,9 @@ def write_markdown(results: dict, names: list[str], meta: dict) -> None:
         "- **leanchecker**: kernel replay of the compiled solution only. It does not",
         "  compare the statement or check axioms, so it is not a full judge on its own.",
         "- **comparator**: `lake comparator`, built into Lean 4.35.0, run in its sandbox.",
-        "- **safeverify**: GasStationManager/SafeVerify at the commit in the workflow.",
+        "- **safeverify**: GasStationManager/SafeVerify at the commit in",
+        "  [`safeverify/COMMIT`](safeverify/COMMIT), rebuilt for Lean 4.35.0 with the",
+        "  one-line axiom-collection fix from SafeVerify#25 ([`safeverify/patch.py`](safeverify/patch.py)).",
         "",
         "| " + " | ".join(head) + " |",
         "|" + "---|" * len(head),
@@ -164,6 +166,16 @@ def write_markdown(results: dict, names: list[str], meta: dict) -> None:
         ran = sum(1 for c in CASES if (r := results[c["name"]].get(n)) and "error" not in r)
         lines.append(f"- **{n}**: {ran - len(wrong)} of {ran} right"
                      + (f"; wrong on {', '.join(f'`{w}`' for w in wrong)}" if wrong else ""))
+    lines += ["", "## Why each checker rejected", "",
+              "First error line from each rejection, so a reject for the wrong reason "
+              "(a crash, a build error) is visible.", ""]
+    for case in CASES:
+        reasons = [(n, r["reason"]) for n in names
+                   if (r := results[case["name"]].get(n)) and "error" not in r
+                   and not r["accepted"] and r.get("reason")]
+        if reasons:
+            lines.append(f"- `{case['name']}`")
+            lines += [f"  - {n}: `{why.replace('`', chr(39))}`" for n, why in reasons]
     (HERE / "CHECKERS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -172,7 +184,13 @@ def main() -> int:
     ap.add_argument("--checkers", default="leanchecker")
     ap.add_argument("--safeverify", help="path to the safe_verify executable")
     ap.add_argument("--only", help="comma-separated case names")
+    ap.add_argument("--render", metavar="CHECKERS_JSON",
+                    help="only rewrite CHECKERS.md from a checkers.json (e.g. a CI artifact)")
     args = ap.parse_args()
+    if args.render:
+        data = json.loads(pathlib.Path(args.render).read_text(encoding="utf-8"))
+        write_markdown(data["cases"], data["checkers"], data["meta"])
+        return 0
     chosen = [c.strip() for c in args.checkers.split(",") if c.strip()]
     for c in chosen:
         if c not in CHECKERS:
